@@ -4,226 +4,163 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Unutulmuş Kule</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-  /* ── TEMEL AYARLAR ──────────────────────────────────────────────
-     * { ... } : Sayfadaki HER elemana bu kuralları uygula
-     box-sizing: border-box → genişlik hesabı padding dahil yapılsın
-     margin/padding 0 → tarayıcının kendi boşluklarını sıfırla
-  */
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* body = sayfanın tamamı
-     min-height: 100vh → en az ekran yüksekliği kadar olsun
-     display: flex + align-items/justify-content → içeriği ortala
-  */
-  body {
-    min-height: 100vh;
-    background: #0a0a0f;
-    color: #d4c9a8;
-    font-family: 'Crimson Text', Georgia, serif;
-    font-size: 18px;
-    line-height: 1.8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    /* Arka plan deseni: çok ince bir ızgara */
-    background-image:
-      linear-gradient(rgba(180,150,80,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(180,150,80,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
+body {
+  min-height: 100vh;
+  background: #0a0a0f;
+  color: #d4c9a8;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-image:
+    linear-gradient(rgba(180,150,80,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,150,80,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
 
-  /* Ana kapsayıcı kutu */
-  #oyun-kutusu {
-    max-width: 720px;
-    width: 100%;
-  }
+#oyun-kutusu { max-width: 720px; width: 100%; }
 
-  /* ── BAŞLIK ALANI ─────────────────────────────────────────────── */
-  #baslik {
-    text-align: center;
-    margin-bottom: 40px;
-    opacity: 0;  /* Başta görünmez, sonra animasyonla çıkacak */
-    animation: yuksel 1.2s ease forwards;  /* 1.2 saniyede yukarı çıkarak belir */
-  }
+/* ── BAŞLIK ── */
+#baslik {
+  text-align: center; margin-bottom: 40px;
+  opacity: 0; animation: yuksel 1.2s ease forwards;
+}
+#baslik h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(28px, 5vw, 48px);
+  color: #c9a84c; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 8px;
+}
+#baslik .alt-baslik { font-style: italic; color: #7a6e5a; font-size: 15px; letter-spacing: 2px; }
+.ayirici { width: 120px; height: 1px; background: linear-gradient(90deg, transparent, #c9a84c, transparent); margin: 16px auto; }
 
-  #baslik h1 {
-    font-family: 'Cinzel', serif;  /* Fantastik tarz serif font */
-    font-size: clamp(28px, 5vw, 48px);  /* Ekran boyutuna göre otomatik küçül/büyü */
-    color: #c9a84c;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
+/* ── DURUM ÇUBUĞU ── */
+#durum-cubugu {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 24px; padding: 12px 16px;
+  border-bottom: 1px solid rgba(180,150,60,0.15);
+  font-size: 13px; color: #7a6e5a;
+  letter-spacing: 1px; font-family: 'Cinzel', serif;
+}
+.durum-item { display: flex; align-items: center; gap: 6px; }
+.durum-deger { color: #c9a84c; }
+/* Can bar */
+#can-bar-wrap { display:flex; align-items:center; gap:8px; }
+#can-bar-bg { width:80px; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden; }
+#can-bar { height:100%; border-radius:3px; transition: width 0.4s ease, background 0.4s ease; }
 
-  #baslik .alt-baslik {
-    font-style: italic;
-    color: #7a6e5a;
-    font-size: 15px;
-    letter-spacing: 2px;
-  }
+/* ── METİN KUTUSU ── */
+#metin-kutusu {
+  background: rgba(20,17,10,0.85);
+  border: 1px solid rgba(180,150,60,0.2);
+  border-radius: 4px; padding: 36px 40px;
+  margin-bottom: 28px; min-height: 180px; position: relative;
+}
+#metin-kutusu::before, #metin-kutusu::after {
+  content: ''; position: absolute; width: 20px; height: 20px;
+  border-color: #c9a84c; border-style: solid; opacity: 0.5;
+}
+#metin-kutusu::before { top:8px; left:8px; border-width:1px 0 0 1px; }
+#metin-kutusu::after  { bottom:8px; right:8px; border-width:0 1px 1px 0; }
+#metin-kutusu p { margin-bottom: 14px; opacity:0; animation: goster 0.6s ease forwards; }
+.vurgu { color: #c9a84c; font-style: italic; }
+.cesur  { color: #e8d9b0; font-weight: 600; }
+.kirmizi { color: #e05555; font-weight: 600; }
+.yesil   { color: #6abf69; font-weight: 600; }
 
-  /* Başlık altındaki ince altın çizgi */
-  .ayirici {
-    width: 120px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #c9a84c, transparent);
-    margin: 16px auto;
-  }
+/* ── SEÇENEKLER ── */
+#secenekler { display: flex; flex-direction: column; gap: 10px; }
+.secenek-btn {
+  background: transparent;
+  border: 1px solid rgba(180,150,60,0.3);
+  color: #d4c9a8; font-family: 'Crimson Text', serif; font-size: 16px;
+  padding: 14px 24px; text-align: left; cursor: pointer;
+  border-radius: 2px; transition: all 0.25s ease;
+  position: relative; opacity:0; animation: goster 0.5s ease forwards;
+}
+.secenek-btn::before { content:'›'; color:#c9a84c; margin-right:12px; font-size:20px; transition:transform 0.2s ease; display:inline-block; }
+.secenek-btn:hover { background:rgba(180,150,60,0.08); border-color:rgba(180,150,60,0.6); color:#e8d9b0; padding-left:32px; }
+.secenek-btn:hover::before { transform:translateX(4px); }
+.secenek-btn:active { transform:scale(0.99); }
+/* Savaş butonları renk kodları */
+.secenek-btn.saldir   { border-color: rgba(220,80,80,0.4); }
+.secenek-btn.saldir:hover { background:rgba(220,80,80,0.1); border-color:rgba(220,80,80,0.7); }
+.secenek-btn.savun    { border-color: rgba(80,150,220,0.4); }
+.secenek-btn.savun:hover { background:rgba(80,150,220,0.1); border-color:rgba(80,150,220,0.7); }
+.secenek-btn.strateji { border-color: rgba(180,150,60,0.5); }
 
-  /* ── HİKAYE METİN KUTUSU ─────────────────────────────────────── */
-  #metin-kutusu {
-    background: rgba(20, 17, 10, 0.85);
-    border: 1px solid rgba(180, 150, 60, 0.2);
-    border-radius: 4px;
-    padding: 36px 40px;
-    margin-bottom: 28px;
-    min-height: 180px;
-    position: relative;
-    /* Köşe süsü için */
-  }
+/* ── SAVAŞ EKRANI ── */
+#savas-alani {
+  display: none; /* Başta gizli, savaş başlayınca açılır */
+  margin-bottom: 24px;
+  border: 1px solid rgba(220,80,80,0.3);
+  border-radius: 4px; overflow: hidden;
+}
+#savas-baslik {
+  background: rgba(220,80,80,0.15);
+  padding: 10px 20px; font-family:'Cinzel',serif;
+  font-size:13px; letter-spacing:2px; color:#e05555;
+  text-align:center; text-transform:uppercase;
+}
+#savas-icerik { display:flex; gap:0; }
 
-  /* Metin kutusunun köşe süsleri (CSS ile çizilen dekorasyon) */
-  #metin-kutusu::before,
-  #metin-kutusu::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-color: #c9a84c;
-    border-style: solid;
-    opacity: 0.5;
-  }
-  #metin-kutusu::before { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
-  #metin-kutusu::after  { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+/* Düşman kartı */
+#dusman-kart {
+  flex:1; padding:20px; border-right:1px solid rgba(220,80,80,0.2);
+  background:rgba(15,10,10,0.6);
+}
+#dusman-isim { font-family:'Cinzel',serif; font-size:15px; color:#e05555; margin-bottom:8px; }
+#dusman-can-yazi { font-size:13px; color:#7a6e5a; margin-bottom:6px; font-family:'Cinzel',serif; }
+#dusman-can-bg { width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden; margin-bottom:10px; }
+#dusman-can-bar { height:100%; background: linear-gradient(90deg, #8b0000, #e05555); border-radius:4px; transition:width 0.4s ease; }
+#dusman-zayiflik { font-size:13px; color:#7a6e5a; font-style:italic; }
+#dusman-ascii { font-size:28px; text-align:center; margin:10px 0; opacity:0.8; }
 
-  /* Metin içindeki paragraf */
-  #metin-kutusu p {
-    margin-bottom: 14px;
-    opacity: 0;
-    animation: goster 0.6s ease forwards;
-  }
+/* Oyuncu savaş durumu */
+#oyuncu-savas { flex:1; padding:20px; background:rgba(10,10,20,0.6); }
+#oyuncu-savas-baslik { font-family:'Cinzel',serif; font-size:13px; color:#c9a84c; margin-bottom:8px; letter-spacing:1px; }
+#savas-log {
+  font-size:14px; line-height:1.7; color:#a09880;
+  max-height:120px; overflow-y:auto; padding-right:4px;
+}
+#savas-log p { margin-bottom:4px; opacity:0; animation:goster 0.4s ease forwards; }
+.log-hasar  { color:#e05555; }
+.log-savun  { color:#5096dc; }
+.log-strateji { color:#c9a84c; }
+.log-sistem { color:#7a6e5a; font-style:italic; }
 
-  /* İtalik vurgu için */
-  .vurgu { color: #c9a84c; font-style: italic; }
-  .cesur  { color: #e8d9b0; font-weight: 600; }
+/* ── GEÇİŞ PERDESİ ── */
+#gecis-perdesi {
+  position:fixed; inset:0; background:#0a0a0f;
+  pointer-events:none; opacity:0; transition:opacity 0.4s ease; z-index:100;
+}
 
-  /* ── SEÇENEKLER ALANI ────────────────────────────────────────── */
-  #secenekler {
-    display: flex;
-    flex-direction: column;  /* Butonları alt alta sırala */
-    gap: 10px;               /* Butonlar arası boşluk */
-  }
+/* ── ANİMASYONLAR ── */
+@keyframes yuksel { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes goster { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes titrek { 0%,100%{opacity:0.9} 50%{opacity:0.7} }
+@keyframes sarsil { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.sarsil { animation: sarsil 0.3s ease; }
 
-  /* Her bir seçenek butonu */
-  .secenek-btn {
-    background: transparent;
-    border: 1px solid rgba(180, 150, 60, 0.3);
-    color: #d4c9a8;
-    font-family: 'Crimson Text', serif;
-    font-size: 16px;
-    padding: 14px 24px;
-    text-align: left;
-    cursor: pointer;         /* Fare üstüne gelince el işareti */
-    border-radius: 2px;
-    transition: all 0.25s ease;  /* Hover geçişi yumuşak olsun */
-    position: relative;
-    opacity: 0;
-    animation: goster 0.5s ease forwards;
-    /* Her butona farklı gecikme, aşağıda JS ile verilecek */
-  }
-
-  /* Butonun solundaki › işareti */
-  .secenek-btn::before {
-    content: '›';
-    color: #c9a84c;
-    margin-right: 12px;
-    font-size: 20px;
-    transition: transform 0.2s ease;
-    display: inline-block;
-  }
-
-  /* Fare üstüne gelince (hover durumu) */
-  .secenek-btn:hover {
-    background: rgba(180, 150, 60, 0.08);
-    border-color: rgba(180, 150, 60, 0.6);
-    color: #e8d9b0;
-    padding-left: 32px;  /* Hafifçe sağa kaydır */
-  }
-
-  .secenek-btn:hover::before {
-    transform: translateX(4px);  /* Ok biraz öne gitsin */
-  }
-
-  /* Tıklanan buton efekti */
-  .secenek-btn:active {
-    transform: scale(0.99);
-  }
-
-  /* ── ENVANTER / DURUM ÇUBUĞU ─────────────────────────────────── */
-  #durum-cubugu {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(180, 150, 60, 0.15);
-    font-size: 13px;
-    color: #7a6e5a;
-    letter-spacing: 1px;
-    font-family: 'Cinzel', serif;
-  }
-
-  .durum-item { display: flex; align-items: center; gap: 6px; }
-  .durum-deger { color: #c9a84c; }
-
-  /* ── GEÇİŞ EFEKTİ ────────────────────────────────────────────── */
-  /* Ekran kararma efekti (sahne değişiminde) */
-  #gecis-perdesi {
-    position: fixed;
-    inset: 0;  /* top/right/bottom/left = 0 (kısayol) */
-    background: #0a0a0f;
-    pointer-events: none;  /* Tıklamaları engelleme */
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: 100;
-  }
-
-  /* ── ANİMASYONLAR ────────────────────────────────────────────── */
-  /* @keyframes: animasyon adımlarını tanımlar */
-  @keyframes yuksel {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes goster {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Titreyen mum ışığı efekti (arka plan rengi için) */
-  @keyframes titrek {
-    0%, 100% { opacity: 0.9; }
-    50%       { opacity: 0.7; }
-  }
-
-  /* ── MOBİL UYUM ──────────────────────────────────────────────── */
-  @media (max-width: 600px) {
-    #metin-kutusu { padding: 24px 20px; }
-  }
+@media (max-width:600px) {
+  #metin-kutusu { padding:24px 20px; }
+  #savas-icerik { flex-direction:column; }
+  #dusman-kart { border-right:none; border-bottom:1px solid rgba(220,80,80,0.2); }
+}
 </style>
 </head>
 <body>
 
-<!-- Sahne geçiş perdesi: görünmez, animasyonla aktif hale gelir -->
 <div id="gecis-perdesi"></div>
 
-<!-- Ana oyun kutusu -->
 <div id="oyun-kutusu">
 
-  <!-- Başlık -->
   <div id="baslik">
     <div class="alt-baslik">Bir Metin Macerası</div>
     <div class="ayirici"></div>
@@ -231,66 +168,144 @@
     <div class="ayirici"></div>
   </div>
 
-  <!-- Durum çubuğu: oyuncu bilgileri -->
   <div id="durum-cubugu">
     <div class="durum-item">KAHRAMAN: <span class="durum-deger" id="d-isim">Kael</span></div>
-    <div class="durum-item">CAN: <span class="durum-deger" id="d-can">❤ 100</span></div>
+    <div class="durum-item">
+      <span id="can-bar-wrap">
+        CAN: <span class="durum-deger" id="d-can-yazi">100</span>
+        <span id="can-bar-bg"><span id="can-bar" style="width:100%;background:#6abf69"></span></span>
+      </span>
+    </div>
     <div class="durum-item">CESARET: <span class="durum-deger" id="d-cesaret">★★★☆☆</span></div>
     <div class="durum-item">ENVANTER: <span class="durum-deger" id="d-envanter">Fener, Hançer</span></div>
   </div>
 
-  <!-- Hikaye metni buraya yazılacak (JS dolduracak) -->
-  <div id="metin-kutusu">
-    <!-- JavaScript bu alanı dolduracak -->
+  <!-- Savaş alanı (normalde gizli) -->
+  <div id="savas-alani">
+    <div id="savas-baslik">⚔ SAVAŞ ⚔</div>
+    <div id="savas-icerik">
+      <div id="dusman-kart">
+        <div id="dusman-ascii"></div>
+        <div id="dusman-isim">Düşman</div>
+        <div id="dusman-can-yazi">CAN: <span id="d-can-sayi">0</span> / <span id="d-can-max">0</span></div>
+        <div id="dusman-can-bg"><div id="dusman-can-bar" style="width:100%"></div></div>
+        <div id="dusman-zayiflik"></div>
+      </div>
+      <div id="oyuncu-savas">
+        <div id="oyuncu-savas-baslik">SAVAŞ KAYITLARI</div>
+        <div id="savas-log"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- Seçenek butonları buraya gelecek (JS dolduracak) -->
-  <div id="secenekler">
-    <!-- JavaScript bu alanı dolduracak -->
-  </div>
+  <div id="metin-kutusu"></div>
+  <div id="secenekler"></div>
 
 </div>
 
 <script>
 /*
   ═══════════════════════════════════════════════════════════════
-  OYUNUN BEYNİ: JavaScript
+  YENİ ÖZELLIKLER — NE EKLEDİK?
   ═══════════════════════════════════════════════════════════════
 
-  Metin macerası nasıl çalışır?
-  - Her "sahne" bir nesne (object) olarak tanımlanır
-  - Her sahnede: metin ve seçenekler var
-  - Her seçenek bir sonraki sahneye yönlendirir
-  - Bu yapıya "düğüm-bağlantı" (node-link) denir
+  1. SAVAŞ SİSTEMİ
+     - Her düşmanın canı, saldırı gücü ve ZAYIFLIĞI var
+     - 3 hamle: Saldır / Savun / Strateji (zayıflığı kullan)
+     - Strateji hamlesi fazla hasar verir ama her zaman olmaz
+     - Yanlış hamle yaparsan düşman daha çok vurur
+     - Can 0 olursa "ölüm sahnesi" açılır
+
+  2. 2. BÖLÜM
+     - Kaçış sahneleri
+     - Canlı kule (odalar değişiyor)
+     - Birlik askerleriyle savaş
+     - Karanlık bir sır: liderin kim olduğu
+
+  3. CAN SİSTEMİ
+     - Can bar görsel olarak değişiyor (yeşil→sarı→kırmızı)
+     - Hasar animasyonu (ekran sarsılıyor)
+═══════════════════════════════════════════════════════════════
 */
 
-// ── OYUNCU DURUMU ──────────────────────────────────────────────
-// Bu nesne oyuncunun tüm bilgilerini tutar
-// Oyun boyunca değişebilir
+// ── OYUNCU ────────────────────────────────────────────────────
 const oyuncu = {
   isim: "Kael",
   can: 100,
-  cesaret: 3,       // 1-5 arası
+  maxCan: 100,
+  cesaret: 3,
   envanter: ["Fener", "Hançer"],
-  kararlar: [],     // Verilen kararları hatırlıyoruz (ileride hikayeyi etkiler)
+  kararlar: [],
+  // Savaş istatistikleri
+  saldiriGucu: 18,   // Temel saldırı hasarı
+  savunma: 5,        // Savunma hamlesi kaç hasar keser
 };
 
-// ── TÜM SAHNELER ───────────────────────────────────────────────
+// ── DÜŞMAN ŞABLONLARI ─────────────────────────────────────────
 /*
-  YAPISI:
-  "sahne_adi": {
-    metin: ["Paragraf 1", "Paragraf 2", ...],
-    secenekler: [
-      { metin: "Buton yazısı", sonraki: "gidilecek_sahne" },
-      ...
-    ]
-  }
-
-  Özel komutlar:
-  - kosul: (oyuncu) => true/false  →  Sadece koşul sağlanırsa göster
-  - etki: (oyuncu) => { ... }      →  Seçilince oyuncuyu değiştir
+  Her düşmanın:
+  - can, saldiri: rakamsal değerler
+  - zayiflik: bu hamleyi seçersen fazla hasar verirsin
+  - ascii: ekranda gösterilecek sembol/emoji
+  - savasMetni: savaş ekranında ne yazar
 */
+const dusmanlar = {
+  "golge_asker": {
+    isim: "Gölge Asker",
+    ascii: "🗡️",
+    can: 55, maxCan: 55,
+    saldiri: 14,
+    zayiflik: "strateji",   // Stratejiye karşı zayıf
+    zayiflikAciklama: "Zayıflık: Savunmasız yanı var — doğru hamleyi bul",
+    olumMetni: "Asker senin darbene dayanamayıp yere yığılıyor. Zırh parçaları taşlara çarpıyor.",
+  },
+  "kule_bekcisi": {
+    isim: "Kule Bekçisi",
+    ascii: "🛡️",
+    can: 80, maxCan: 80,
+    saldiri: 20,
+    zayiflik: "saldir",     // Direkt saldırıya zayıf
+    zayiflikAciklama: "Zayıflık: Ağır zırh ama yavaş — hızlı saldırıya açık",
+    olumMetni: "Bekçi diz çöküyor. Kaskı düşüyor. Gözlerinde şaşkınlık var.",
+  },
+  "gece_yarasi": {
+    isim: "Gece Yarısı",
+    ascii: "🌑",
+    can: 45, maxCan: 45,
+    saldiri: 28,
+    zayiflik: "savun",      // Savunmaya zayıf (saldırılarını boşa çıkarırsın)
+    zayiflikAciklama: "Zayıflık: Saldırıları güçlü ama savunma bozunca kendini kaybediyor",
+    olumMetni: "Karanlık figür çığlık atar gibi bir ses çıkarıp dağılıyor. Geriye sadece soğuk hava kalıyor.",
+  },
+  "birlik_lideri": {
+    isim: "Birlik Lideri — Raven",
+    ascii: "👁️",
+    can: 120, maxCan: 120,
+    saldiri: 25,
+    zayiflik: "strateji",
+    zayiflikAciklama: "Zayıflık: Gururu var. Kendini en iyi zannediyor. Bunu kullan.",
+    olumMetni: "Raven yere düşüyor. Maskesi çatlıyor. Ve altındaki yüz... seni şok ediyor.",
+  },
+};
+
+// ── AKTİF SAVAŞ DURUMU ────────────────────────────────────────
+// Savaş sırasında bu nesne dolacak
+let aktifSavas = null;
+/*
+  aktifSavas = {
+    dusman: { ...dusmanlar["golge_asker"], can: mevcut can },
+    sahneSonrasi: "hangi sahneye dön",
+    olumSahnesi: "ölünce nereye git",
+    tur: kaçıncı tur
+  }
+*/
+
+// ── SAHNELER ─────────────────────────────────────────────────
 const sahneler = {
+
+  // ════════════════════════════════════
+  //  BİRİNCİ BÖLÜM (Önceki sahneler)
+  // ════════════════════════════════════
 
   "baslangic": {
     metin: [
@@ -346,9 +361,9 @@ const sahneler = {
 
   "izleri_takip": {
     metin: [
-      "İzler koridorun sonuna, <span class='vurgu'>dar bir merdivene</span> çıkıyor. Fenerini kaldırıyorsun.",
+      "İzler koridorun sonuna, <span class='vurgu'>dar bir merdivene</span> çıkıyor.",
       "Merdivenin başında bir <span class='cesur'>pelerin parçası</span> var. Mor kadife. Babana ait.",
-      "Yüreğin hızlanıyor. O burada. Ya da birisi onu buraya getirdi."
+      "Yüreğin hızlanıyor."
     ],
     secenekler: [
       { metin: "Merdiveni çık", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("merdiven_cikti"); } },
@@ -358,12 +373,12 @@ const sahneler = {
 
   "raflari_incele": {
     metin: [
-      "Çürümüş kitapların arasında <span class='vurgu'>bir deri cilt</span> dikkatini çekiyor. Nemden bozulmamış, sanki korunmuş.",
-      "İçinde <span class='cesur'>babanın el yazısı:</span> \"Kael, eğer buraya ulaştıysan, zincirli kapının sırrı senin adındadır. K-A-E-L. Her harf bir halka.\"",
-      "Ellerinde titreyerek kitabı kapatıyorsun. Seni bekliyordu."
+      "Çürümüş kitapların arasında <span class='vurgu'>bir deri cilt</span> dikkatini çekiyor. Nemden bozulmamış.",
+      "İçinde <span class='cesur'>babanın el yazısı:</span> \"Kael, zincirli kapının sırrı senin adındadır. K-A-E-L. Her harf bir halka.\"",
+      "Ellerinde titreyerek kitabı kapatıyorsun."
     ],
     secenekler: [
-      { metin: "Kitabı yanına al ve zincirli kapıya git", sonraki: "demir_kapi_coz", etki: (o) => { o.envanter.push("Babanın Kitabı"); o.kararlar.push("kitap_buldu"); } },
+      { metin: "Kitabı al ve zincirli kapıya git", sonraki: "demir_kapi_coz", etki: (o) => { o.envanter.push("Babanın Kitabı"); o.kararlar.push("kitap_buldu"); } },
       { metin: "Devam et, izleri takip et", sonraki: "ahsap_kapi" },
     ]
   },
@@ -371,20 +386,18 @@ const sahneler = {
   "sembol_incele": {
     metin: [
       "Sembol dört harften oluşan, birbirine geçmiş bir monogram. <span class='cesur'>K... A... E... L.</span>",
-      "Senin adın.",
-      "Baban bu kilidi <span class='vurgu'>sen için</span> hazırlamış. Bir şekilde biliyordu sen geleceğini."
+      "Senin adın. Baban bu kilidi <span class='vurgu'>sen için</span> hazırlamış."
     ],
     secenekler: [
       { metin: "Her harfi sırayla bas", sonraki: "demir_kapi_acildi", etki: (o) => o.kararlar.push("sifre_cozdu") },
-      { metin: "Emin olamıyorsun, önce içeri bak", sonraki: "pencere_goz" },
+      { metin: "Önce içeri bak", sonraki: "pencere_goz" },
     ]
   },
 
   "kilit_zorla": {
     metin: [
       "Hançerin ucunu kilide sokuyorsun. Zorluyor, döndürüyorsun...",
-      "<span class='vurgu'>Çat.</span> Hançerin ucu kırılıyor. Kilit kıpırdamıyor.",
-      "Hem hançerin hasar gördü, hem de vakit kaybettin."
+      "<span class='kirmizi'>Çat.</span> Hançerin ucu kırılıyor. Kilit kıpırdamıyor.",
     ],
     secenekler: [
       { metin: "Farklı bir yaklaşım dene", sonraki: "baslangic", etki: (o) => { o.envanter = o.envanter.map(e => e === "Hançer" ? "Kırık Hançer" : e); } },
@@ -393,112 +406,93 @@ const sahneler = {
 
   "pencereden_gir": {
     metin: [
-      "Kendini pencereden içeri atıyorsun. Ayakların yere değince bir ses duyulyor.",
-      "Döndüğünde karşında <span class='cesur'>yaşlı bir adam</span> duruyor. Titreyen elleriyle bir mum tutuyor.",
-      "\"Sen... Kael misin?\" diyor titreyerek. \"Seni tanıyorum. Resimdekiyle aynısın.\""
+      "Kendini pencereden içeri atıyorsun.",
+      "Döndüğünde karşında <span class='cesur'>yaşlı bir adam</span> duruyor. \"Sen... Kael misin?\""
     ],
     secenekler: [
-      { metin: "\"Evet. Ve sen kimsin?\"", sonraki: "yasli_adam_tanisma" },
-      { metin: "\"Babam nerede?\" diye sor", sonraki: "baba_nerede_sor" },
+      { metin: "\"Evet. Sen kimsin?\"", sonraki: "yasli_adam_tanisma" },
+      { metin: "\"Babam nerede?\"", sonraki: "baba_nerede_sor" },
     ]
   },
 
   "kapiyi_vur": {
     metin: [
-      "\"İçeride kimse var!\" diye bağırıyorsun. Sesler kuleye yayılıyor.",
-      "Uzun bir sessizlik. Sonra kapı... <span class='vurgu'>içeriden açılıyor.</span>",
-      "Yaşlı bir el kapıyı tutuyor. Bir göz seni süzüyor."
+      "\"İçeride kimse var!\" Uzun sessizlik. Sonra kapı içeriden açılıyor.",
+      "Yaşlı bir el kapıyı tutuyor."
     ],
     secenekler: [
       { metin: "İçeri gir", sonraki: "pencereden_gir" },
-      { metin: "\"Ben Kael. Büyücü Aldric'in oğluyum.\"", sonraki: "yasli_adam_tanisma" },
+      { metin: "\"Ben Kael. Aldric'in oğluyum.\"", sonraki: "yasli_adam_tanisma" },
     ]
   },
 
   "gozle": {
     metin: [
-      "Geri çekilip ağaçların arasına saklanıyorsun. Bekleyip izliyorsun.",
-      "Birkaç dakika sonra penceredeki ışık sönüyor. Ve <span class='cesur'>arka kapıdan biri çıkıyor.</span>",
-      "Yaşlı, yorgun görünümlü biri. Bir şeyler mırıldanıyor kendi kendine. Elinde babanın tanıdık <span class='vurgu'>mor pelerini</span> var."
+      "Ağaçların arasına saklanıyorsun. Birkaç dakika sonra penceredeki ışık sönüyor.",
+      "Arka kapıdan biri çıkıyor. Yaşlı, yorgun. Elinde babanın <span class='vurgu'>mor pelerini</span> var."
     ],
     secenekler: [
-      { metin: "Adamı dur", sonraki: "yasli_adam_dur", etki: (o) => { o.cesaret = Math.min(5, o.cesaret + 1); } },
+      { metin: "Adama dur de", sonraki: "yasli_adam_dur", etki: (o) => { o.cesaret = Math.min(5, o.cesaret+1); } },
       { metin: "Sessizce takip et", sonraki: "yasli_adam_takip" },
     ]
   },
 
   "demir_kapi_coz": {
     metin: [
-      "Kitaptaki ipucunu kullanarak dört halkayı sırayla döndürüyorsun: <span class='vurgu'>K... A... E... L...</span>",
-      "<span class='cesur'>Tık. Tık. Tık. Tık.</span>",
-      "Zincir kendiliğinden düşüyor. Demir kapı içe doğru açılıyor. Basamaklar aşağı iniyor."
+      "Kitaptaki ipucuyla dört halkayı döndürüyorsun: <span class='vurgu'>K... A... E... L...</span>",
+      "<span class='cesur'>Tık. Tık. Tık. Tık.</span> Zincir düşüyor. Kapı açılıyor."
     ],
-    secenekler: [
-      { metin: "Merdivenden in", sonraki: "bodrum" },
-    ]
+    secenekler: [{ metin: "Merdivenden in", sonraki: "bodrum" }]
   },
 
   "demir_kapi_acildi": {
     metin: [
-      "Harfleri basmak için elini uzatıyorsun. K... A... E... L...",
-      "Her harfte bir tık sesi. Dördüncüde zincir çözülüyor.",
-      "Kapı açılıyor. İçeriden <span class='vurgu'>serin, toprak kokusu</span> geliyor."
+      "Her harfte bir tık sesi. Dördüncüde zincir çözülüyor. Kapı açılıyor.",
+      "İçeriden <span class='vurgu'>serin, toprak kokusu</span> geliyor."
     ],
-    secenekler: [
-      { metin: "İçeri gir", sonraki: "bodrum" },
-    ]
+    secenekler: [{ metin: "İçeri gir", sonraki: "bodrum" }]
   },
 
   "pelerin_incele": {
     metin: [
       "Pelerin parçasını avucuna alıyorsun. <span class='vurgu'>Hâlâ sıcak.</span>",
-      "Altında küçük bir not kâğıdı var. Kötü yazılmış, aceleyle: <span class='cesur'>\"3. kat. Güvenli yer. — A\"</span>",
-      "A. Aldric. Baban."
+      "Altında not: <span class='cesur'>\"3. kat. Güvenli yer. — A\"</span>",
     ],
-    secenekler: [
-      { metin: "Koş, merdivenden çık", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("notu_aldi"); o.envanter.push("Babanın Notu"); } },
-    ]
+    secenekler: [{ metin: "Koş, merdivenden çık", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("notu_aldi"); o.envanter.push("Babanın Notu"); } }]
   },
 
   "yasli_adam_tanisma": {
     metin: [
-      "Adam seni görünce gözleri doluyor. \"Aldric'in oğlu... sonunda geldin.\"",
-      "\"Ben Maron. Kulenin eski bekçisi. Babanı... <span class='vurgu'>sakladım</span>. Onu bulmak isteyenlerden.\"",
-      "\"Nerede?\" diyorsun. Sesi alçalıyor: \"<span class='cesur'>Üstte. Ama tehlikeli. Onu koyduklarında zayıftı. Şimdi bilmiyorum...</span>\""
+      "\"Aldric'in oğlu... sonunda geldin.\"",
+      "\"Ben Maron. Babanı <span class='vurgu'>sakladım</span>. Birliğin adamlarından.\"",
+      "\"Nerede?\" — \"<span class='cesur'>Üstte. Ama tehlikeli.</span>\""
     ],
     secenekler: [
-      { metin: "\"Götür beni yanına\"", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("maron_ile_gitti"); } },
-      { metin: "\"Kim istedi onu? Kim peşinde?\"", sonraki: "dusman_hakkinda" },
+      { metin: "\"Götür beni\"", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("maron_ile_gitti"); } },
+      { metin: "\"Kim peşinde babanın?\"", sonraki: "dusman_hakkinda" },
     ]
   },
 
   "baba_nerede_sor": {
     metin: [
-      "Adam duraksıyor. Dudakları titriyor.",
-      "\"Yukarıda. Ama... dikkatli ol. Kule onu değiştirdi.\"",
-      "\"Ne demek istiyorsun?\" Adam cevap vermeden içeri giriyor. Takip etmek zorunda kalıyorsun."
+      "\"Yukarıda. Ama dikkatli ol. Kule onu değiştirdi.\"",
+      "\"Ne demek istiyorsun?\" Adam cevap vermeden içeri giriyor."
     ],
-    secenekler: [
-      { metin: "Takip et", sonraki: "ust_kat" },
-    ]
+    secenekler: [{ metin: "Takip et", sonraki: "ust_kat" }]
   },
 
   "yasli_adam_dur": {
     metin: [
-      "\"Dur!\" diye bağırıyorsun. Adam donup kalıyor. Pelerini sıkıca tutuyor.",
-      "\"Saldırmayacağım,\" diyorsun. \"Ben Kael. Aldric'in oğluyum.\"",
-      "Adam yavaşça dönüyor. Yüzünde <span class='vurgu'>hem korku hem umut</span> var. \"Tanrım... gerçekten geldin.\""
+      "\"Dur!\" Adam donup kalıyor.",
+      "\"Ben Kael. Aldric'in oğluyum.\" Adam yavaşça dönüyor. Yüzünde <span class='vurgu'>hem korku hem umut</span>."
     ],
-    secenekler: [
-      { metin: "\"Babam nerede?\"", sonraki: "yasli_adam_tanisma" },
-    ]
+    secenekler: [{ metin: "\"Babam nerede?\"", sonraki: "yasli_adam_tanisma" }]
   },
 
   "yasli_adam_takip": {
     metin: [
-      "Gölgeden gölgeye atlayarak adamı takip ediyorsun. Kule etrafında dolaşıyor.",
-      "Bir yerde duruyor, yere bakıyor. Sonra diz çöküyor ve <span class='vurgu'>taşları kaldırıyor.</span>",
-      "Altında gizli bir kapak. İçerisi karanlık. Adam içine giriyor."
+      "Adam kule etrafında dolaşıyor, bir yerde diz çöküp taşları kaldırıyor.",
+      "Altında <span class='vurgu'>gizli bir kapak.</span> İçerisi karanlık."
     ],
     secenekler: [
       { metin: "Kapaktan in", sonraki: "bodrum" },
@@ -508,159 +502,696 @@ const sahneler = {
 
   "dusman_hakkinda": {
     metin: [
-      "Maron derin bir nefes alıyor. \"Birliğin adamları. Babanın keşfettiği <span class='vurgu'>büyü formülünü</span> istediler.\"",
-      "\"O vermedi. Bu yüzden onu... burada sakladım. Dışarısı güvenli değil.\"",
-      "\"Ama artık senin geldiğini biliyorlarsa...\" Adam pencereden bakıyor. \"Gitmemiz lazım.\""
+      "\"Birliğin adamları. Babanın keşfettiği <span class='vurgu'>büyü formülünü</span> istediler.\"",
+      "\"O vermedi. Ama artık senin geldiğini biliyorlarsa...\" Adam pencereden bakıyor. <span class='kirmizi'>\"Gitmemiz lazım.\"</span>"
     ],
-    secenekler: [
-      { metin: "\"Tamam. Götür beni.\"", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("birlik_ogrendi"); } },
-    ]
+    secenekler: [{ metin: "\"Tamam. Götür beni.\"", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("birlik_ogrendi"); } }]
   },
 
   "ust_kat": {
     metin: [
-      "Merdivenleri çıkıyorsun. Her adımda kule titrercesine inliyor sanki.",
-      "Üçüncü kat. Dar bir koridor. Sonunda <span class='vurgu'>ışık sızan bir kapı.</span>",
-      "Eliyle kapıyı yavaşça itiyorsun..."
+      "Merdivenleri çıkıyorsun. Her adımda kule inliyor sanki.",
+      "Üçüncü kat. Dar koridor. Sonunda <span class='vurgu'>ışık sızan bir kapı.</span>"
     ],
-    secenekler: [
-      { metin: "Kapıyı aç", sonraki: "baba_ile_kavusma" },
-    ]
+    secenekler: [{ metin: "Kapıyı aç", sonraki: "baba_ile_kavusma" }]
   },
 
   "bodrum": {
     metin: [
       "Basamaklar seni derin, taş duvarlı bir odaya götürüyor.",
-      "Ortada <span class='vurgu'>parlak kristaller</span> içinde donmuş gibi duran bir figür var.",
-      "Babanın yüzü. <span class='cesur'>Hayatta.</span> Ama hareketsiz."
+      "Ortada <span class='vurgu'>parlak kristaller</span> içinde donmuş figür. Babanın yüzü. <span class='cesur'>Hayatta.</span>"
     ],
     secenekler: [
       { metin: "Kristale dokun", sonraki: "kristal_dokunma" },
-      { metin: "Etrafı incele, çözüm ara", sonraki: "bodrum_incele" },
+      { metin: "Etrafı incele", sonraki: "bodrum_incele" },
     ]
   },
 
   "kristal_dokunma": {
     metin: [
-      "Parmaklarını kristale değdiriyorsun. <span class='vurgu'>Elektrik gibi</span> bir his tüm kolunu sarıyor.",
-      "Ve babanın gözleri... açılıyor.",
-      "\"Kael.\" Sesi zayıf, ama o ses. <span class='cesur'>O ses.</span>",
-      "\"Beni buldun.\""
+      "Parmaklarını kristale değdiriyorsun. <span class='vurgu'>Elektrik gibi</span> bir his.",
+      "Babanın gözleri açılıyor. \"Kael.\" Sesi zayıf. <span class='cesur'>\"Beni buldun.\"</span>"
     ],
-    secenekler: [
-      { metin: "[BÖLÜM SONU — Devam Et]", sonraki: "bolum_sonu" },
-    ]
+    secenekler: [{ metin: "[ 1. Bölüm Sonu — 2. Bölüm Başlıyor ]", sonraki: "b2_baslangic" }]
   },
 
   "bodrum_incele": {
     metin: [
-      "Duvarlarda simgeler. Kristal etrafında <span class='vurgu'>dört taş levha.</span> Her birinde bir sözcük.",
-      "\"Adını söyle, zinciri kır.\"",
-      "Anladın. Bu kristal, içindekinin adını bilen biri tarafından açılabilir."
+      "\"Adını söyle, zinciri kır.\" — Kristal, içindekinin adını bilen biri tarafından açılabilir."
     ],
-    secenekler: [
-      { metin: "\"Aldric.\" diye fısılda", sonraki: "kristal_dokunma" },
-    ]
+    secenekler: [{ metin: "\"Aldric\" diye fısılda", sonraki: "kristal_dokunma" }]
   },
 
   "baba_ile_kavusma": {
     metin: [
-      "Oda. Küçük, nemli. Ama ortasında bir yatak ve onda yatan adam...",
-      "<span class='cesur'>Baban.</span>",
-      "Gözlerini açıyor. Seni görüyor. Sözcükler çıkmıyor ağzından. Sadece elleri uzanıyor sana doğru.",
-      "Yıllar. Yıllar süren arayış. Ve şimdi burada."
+      "Oda. Küçük, nemli. Ama ortasında bir yatak ve onda yatan adam... <span class='cesur'>Baban.</span>",
+      "Gözlerini açıyor. Seni görüyor. Sözcükler çıkmıyor ağzından.",
+      "Yıllar süren arayış. Ve şimdi burada."
+    ],
+    secenekler: [{ metin: "[ 1. Bölüm Sonu — 2. Bölüm Başlıyor ]", sonraki: "b2_baslangic" }]
+  },
+
+  // ════════════════════════════════════
+  //  İKİNCİ BÖLÜM — Kaçış
+  // ════════════════════════════════════
+
+  "b2_baslangic": {
+    metin: [
+      "<span class='vurgu'>— İKİNCİ BÖLÜM: KAÇIŞ —</span>",
+      "Baban seni görünce elleri titreyerek seni tutuyor. \"Gitmeliyiz. <span class='kirmizi'>Şimdi.</span> Onlar geliyor.\"",
+      "\"Kim?\" diyorsun. Ama cevabı biliyorsun zaten.",
+      "Uzaktan sesler. Demir çizmeler. Birden fazla. <span class='cesur'>Kule etrafını sarmışlar.</span>"
     ],
     secenekler: [
-      { metin: "[BÖLÜM SONU — Devam Et]", sonraki: "bolum_sonu" },
+      { metin: "\"Babam, formül nedir? Ne istiyorlar?\"", sonraki: "b2_formul_sor" },
+      { metin: "Sorular sonra — önce kaçış yolu bul", sonraki: "b2_kacis_ara", etki: (o) => o.cesaret = Math.min(5, o.cesaret+1) },
     ]
   },
 
-  "bolum_sonu": {
+  "b2_formul_sor": {
     metin: [
-      "<span class='vurgu'>— BİRİNCİ BÖLÜM SONU —</span>",
-      "Babana kavuştun. Ama kule hâlâ sırlarını saklıyor. Birlik yakında burada olacak.",
-      "Ve babanın sana söyleyeceği bir şey var. Bir sır. O büyü formülü hakkında.",
-      "<span class='cesur'>İkinci bölüm yakında...</span>",
+      "Baban gözlerini kapatıyor. \"Formül... <span class='vurgu'>ölüleri geri getirebiliyor.</span>\"",
+      "Sesin çıkmıyor. O devam ediyor: \"Birlik bunu silah yapmak istiyor. Orduları yok edilemez hale getirmek için.\"",
+      "\"Verdin mi onlara?\" — \"<span class='kirmizi'>Hayır. Asla. Ama artık senin kanında.</span>\" Elini bileğine koyuyor. \"Seni ele geçirirlerse formülü bulurlar.\""
     ],
     secenekler: [
-      { metin: "Baştan oyna", sonraki: "baslangic", etki: (o) => { o.can=100; o.cesaret=3; o.envanter=["Fener","Hançer"]; o.kararlar=[]; } },
+      { metin: "\"Yani ben bir silahım.\"", sonraki: "b2_silah_sahne", etki: (o) => o.kararlar.push("formul_ogrendi") },
     ]
   },
+
+  "b2_silah_sahne": {
+    metin: [
+      "Baban başını eğiyor. \"Özür dilerim. Seni tehlikeye attım.\"",
+      "<span class='cesur'>Kapı gürültüyle açılıyor.</span>",
+      "İki <span class='kirmizi'>Gölge Asker</span> içeri doluyor. Siyah zırh. Yüzsüz miğfer.",
+      "\"Kael adındaki kişi teslim olacak. Diğeri... önemli değil.\""
+    ],
+    secenekler: [
+      { metin: "Savaş — babanı koru!", sonraki: "b2_savas_1", etki: (o) => o.kararlar.push("savasti") },
+      { metin: "\"Tamam. Gidiyorum. Babamı bırakın.\"", sonraki: "b2_teslim_ol" },
+    ]
+  },
+
+  // Savaş sahneleri özel: "savas" tipi
+  "b2_savas_1": {
+    tip: "savas",
+    dusman: "golge_asker",
+    metin: [
+      "Hançerini çekiyorsun. Baban \"Hayır—\" diye bağırmaya çalışıyor ama sesi çıkmıyor.",
+      "<span class='cesur'>Gölge Asker sana doğru yürüyor.</span> Hamleni seç."
+    ],
+    sahneSonrasi: "b2_savas_1_zafer",
+    olumSahnesi: "b2_olum_asker"
+  },
+
+  "b2_savas_1_zafer": {
+    metin: [
+      "<span class='yesil'>Asker yere düşüyor.</span> İkincisi geri çekiliyor — ama kaçmıyor.",
+      "\"Beklenmedik.\" diyor soğuk bir sesle. Telsizine uzanıyor. <span class='kirmizi'>\"Takviye istiyorum.\"</span>",
+      "Baban koluna giriyor. \"Arka kapı var. Hızlı.\""
+    ],
+    secenekler: [
+      { metin: "Arka kapıya koş", sonraki: "b2_kacis_koridoru" },
+      { metin: "İkinci askeri de durdur", sonraki: "b2_savas_2" },
+    ]
+  },
+
+  "b2_savas_2": {
+    tip: "savas",
+    dusman: "kule_bekcisi",
+    metin: [
+      "İkinci asker zırhını sıkıştırıyor. Bu birinciden farklı — daha ağır, daha yavaş.",
+      "<span class='cesur'>Ama bir darbesi yetebilir.</span>"
+    ],
+    sahneSonrasi: "b2_kacis_koridoru",
+    olumSahnesi: "b2_olum_asker"
+  },
+
+  "b2_teslim_ol": {
+    metin: [
+      "Ellerini kaldırıyorsun. Askerler seni kollarından tutuyor.",
+      "Baban \"Hayır! <span class='kirmizi'>HAYIR!</span>\" diye bağırıyor. Sesi kırılıyor.",
+      "Seni dışarı çıkarırken son kez dönüp bakıyorsun. Babanın gözleri. Yıkılmış.",
+      "<span class='kirmizi'>Teslim olmamalıydın.</span>"
+    ],
+    secenekler: [{ metin: "[ OYUN BİTTİ — Tekrar Dene ]", sonraki: "b2_baslangic", etki: (o) => { o.can=100; } }]
+  },
+
+  "b2_olum_asker": {
+    metin: [
+      "Asker son darbeyi indiriyor. <span class='kirmizi'>Yere çöküyorsun.</span>",
+      "Baban haykırıyor. Ses uzaklaşıyor... uzaklaşıyor...",
+      "<span class='kirmizi'>Karanlık.</span>"
+    ],
+    secenekler: [{ metin: "[ Tekrar Dene — Savaşa Geri Dön ]", sonraki: "b2_silah_sahne", etki: (o) => { o.can=100; } }]
+  },
+
+  "b2_kacis_ara": {
+    metin: [
+      "Odayı hızlıca tarıyorsun. Pencere — demir parmaklıklı. Kapı — tek çıkış.",
+      "Ama duvarda... <span class='vurgu'>bir iz.</span> Taşlar arasında bir aralık. Gizli geçit.",
+      "\"Baba, yürüyebilir misin?\" Başını sallıyor. Ağır da olsa."
+    ],
+    secenekler: [
+      { metin: "Gizli geçitten geç", sonraki: "b2_gizli_gecit", etki: (o) => o.kararlar.push("gecit_buldu") },
+      { metin: "Askerler gelmeden kapıdan çık", sonraki: "b2_silah_sahne" },
+    ]
+  },
+
+  "b2_gizli_gecit": {
+    metin: [
+      "Taşları iterek geçidi açıyorsun. Dar, karanlık. Babanı içeri alıyorsun.",
+      "Geçit sizi <span class='vurgu'>kulenin altına</span>, taş bir tünele çıkarıyor.",
+      "Arkadan sesler. Buldular. <span class='cesur'>Ama henüz değil.</span>"
+    ],
+    secenekler: [
+      { metin: "Tünelde koş", sonraki: "b2_tunel" },
+    ]
+  },
+
+  "b2_kacis_koridoru": {
+    metin: [
+      "Koridorda koşuyorsunuz. Baban ayak sürüyor, ama direnç gösteriyor.",
+      "Köşeyi dönerken <span class='kirmizi'>karanlık bir figür</span> çıkıyor karşınıza.",
+      "Bu asker değil. Başka bir şey. <span class='cesur'>Gece Yarısı</span> — kulenin ruhu."
+    ],
+    secenekler: [
+      { metin: "Savaş!", sonraki: "b2_savas_gece", etki: (o) => o.kararlar.push("gece_ile_savasti") },
+      { metin: "Fenerini figüre tut ve geç", sonraki: "b2_fener_kac", kosul: (o) => o.envanter.includes("Fener") },
+    ]
+  },
+
+  "b2_savas_gece": {
+    tip: "savas",
+    dusman: "gece_yarasi",
+    metin: [
+      "<span class='cesur'>Gece Yarısı</span> — şekil değiştiren karanlık bir varlık. Saldırıları güçlü.",
+      "Ama bir zayıflığı var. Savunmana geçersen kendini kaybediyor."
+    ],
+    sahneSonrasi: "b2_tunel",
+    olumSahnesi: "b2_olum_gece"
+  },
+
+  "b2_olum_gece": {
+    metin: [
+      "Karanlık seni sarıyor. Nefes alamıyorsun.",
+      "<span class='kirmizi'>Gece Yarısı seni yuttu.</span>"
+    ],
+    secenekler: [{ metin: "[ Tekrar Dene ]", sonraki: "b2_kacis_koridoru", etki: (o) => { o.can=100; } }]
+  },
+
+  "b2_fener_kac": {
+    metin: [
+      "Feneri figüre doğru tutuyorsun. Işık onu <span class='vurgu'>geri itiyor.</span>",
+      "Babanın elinden tutup koşuyorsun. Figür bağırıyor ama takip edemiyor.",
+      "<span class='yesil'>Geçtiniz.</span>"
+    ],
+    secenekler: [{ metin: "Tünele devam", sonraki: "b2_tunel" }]
+  },
+
+  "b2_tunel": {
+    metin: [
+      "Tünel sizi <span class='vurgu'>ormanın derinliklerine</span> çıkarıyor. Soğuk hava ciğerlerine doluyor.",
+      "Arkaya bakıyorsun. Kule hâlâ ayakta. Ama içinde ışıklar yanıp sönüyor.",
+      "Baban dizlerinin üstüne çöküyor. Yorgun. Ama <span class='cesur'>serbest.</span>",
+      "\"Raven seni bulacak.\" diyor fısıltıyla. \"Liderlerini tanıyor musun?\""
+    ],
+    secenekler: [
+      { metin: "\"Hayır. Kim bu Raven?\"", sonraki: "b2_raven_sirri" },
+      { metin: "\"Önemli değil. Önce güvende bir yer bulalım.\"", sonraki: "b2_kamp" },
+    ]
+  },
+
+  "b2_raven_sirri": {
+    metin: [
+      "Baban uzun süre susuyor. Eller titriyor.",
+      "\"Raven... <span class='kirmizi'>bir zamanlar benim öğrencimdi.</span>\"",
+      "Bir taş gibi düşüyor bu söz.",
+      "\"Ona her şeyi öğrettim. Formülü de. Ama o... başka bir yol seçti.\""
+    ],
+    secenekler: [
+      { metin: "\"Onu durdurmamız gerekiyor.\"", sonraki: "b2_karar", etki: (o) => { o.kararlar.push("raven_ogrendim"); o.cesaret = Math.min(5, o.cesaret+1); } },
+      { metin: "\"Kaçabiliriz. Uzaklaşabiliriz.\"", sonraki: "b2_kac_kac" },
+    ]
+  },
+
+  "b2_kamp": {
+    metin: [
+      "Ormanda küçük bir barınak. Ateş yakıyorsunuz.",
+      "Baban sana bakıyor. \"Sormak istediğin şeyler var, biliyorum.\"",
+      "\"Raven kim?\" diyorsun."
+    ],
+    secenekler: [{ metin: "Cevabı dinle", sonraki: "b2_raven_sirri" }]
+  },
+
+  "b2_kac_kac": {
+    metin: [
+      "Baban başını sallıyor. \"Evet... kaçabiliriz.\"",
+      "Bir sessizlik. Sonra: \"Ama Raven formülü başkasından alır. Ve kullanır.\"",
+      "<span class='kirmizi'>\"Binlerce kişi ölür. Ve geri getirilir. Sonsuza kadar savaşmak için.\"</span>",
+      "Midenin buruştuğunu hissediyorsun."
+    ],
+    secenekler: [{ metin: "\"Hayır. Durduracağız.\"", sonraki: "b2_karar", etki: (o) => o.cesaret = Math.min(5, o.cesaret+1) }]
+  },
+
+  "b2_karar": {
+    metin: [
+      "Baban gözlerine bakıyor. Uzun süre. Sonra gülümsüyor — ilk kez.",
+      "\"Aldric'in oğlusun gerçekten.\"",
+      "\"Raven'ın üssü kulenin <span class='vurgu'>altında.</span> Gizli bir oda. Ben götürürüm seni.\"",
+      "<span class='cesur'>\"Ama hazır ol. O... artık insan değil.\"</span>"
+    ],
+    secenekler: [
+      { metin: "[ 2. Bölüm Sonu — 3. Bölüm Başlıyor ]", sonraki: "b3_giris" }
+    ]
+  },
+
+  // ════════════════════════════════════
+  //  ÜÇÜNCÜ BÖLÜM — Yüzleşme
+  // ════════════════════════════════════
+
+  "b3_giris": {
+    metin: [
+      "<span class='vurgu'>— ÜÇÜNCÜ BÖLÜM: YÜZLEŞME —</span>",
+      "Kuleye geri dönüyorsunuz. Ama bu sefer arka yoldan. Baban yolu biliyor.",
+      "Gizli asansör. Mekanik dişliler. Aşağı iniyorsunuz.",
+      "Kapı açılıyor. <span class='cesur'>Geniş, yuvarlak bir oda.</span> Kristaller her yerde.",
+      "Ve ortada — sırtı dönük, pelerini siyah — <span class='kirmizi'>Raven.</span>"
+    ],
+    secenekler: [
+      { metin: "Sessizce yaklaş", sonraki: "b3_yaklasma" },
+      { metin: "\"Raven!\" diye bağır", sonraki: "b3_bagir" },
+    ]
+  },
+
+  "b3_yaklasma": {
+    metin: [
+      "Adım adım ilerliyorsun. Baban geride bekliyor.",
+      "Raven dönmüyor. <span class='vurgu'>\"Biliyordum geleceklerini.\"</span> Sesi beklenmedik kadar sakin.",
+      "\"Aldric. Oğlunu getirdin. İyi.\" Yavaşça dönüyor.",
+      "Maske. Siyah. Ve altında gözler — <span class='kirmizi'>babanın gözlerine benziyor.</span>"
+    ],
+    secenekler: [
+      { metin: "\"Formülü asla alamazsın.\"", sonraki: "b3_son_savas" },
+      { metin: "\"Neden bunu yapıyorsun?\"", sonraki: "b3_neden" },
+    ]
+  },
+
+  "b3_bagir": {
+    metin: [
+      "Raven anında dönüyor. Hiç şaşırmamış gibi.",
+      "\"Aldric'in oğlu. Cesaretli — ya da aptal.\" Başını eğiyor.",
+      "\"Fark etmez. İkisi de aynı sona çıkar.\""
+    ],
+    secenekler: [
+      { metin: "Savaş!", sonraki: "b3_son_savas" },
+      { metin: "\"Neden bunu yapıyorsun?\"", sonraki: "b3_neden" },
+    ]
+  },
+
+  "b3_neden": {
+    metin: [
+      "Raven duruyor. Bir an. \"Neden mi?\"",
+      "\"Çünkü <span class='kirmizi'>herkes ölüyor.</span> Anneni hatırlıyor musun, Kael?\" Donuyorsun.",
+      "\"Hayır. Çok küçüktün. Ama ben gördüm. Aldric onun için formülü buldu. Ama kullanmadı.\"",
+      "\"<span class='cesur'>Ben kullanacağım. Bir daha kimse kaybetmeyecek.</span>\"",
+      "\"Ama bunun için savaş gerekiyor\" diyorsun. \"Ölümsüz ordu.\" — \"Gerekli bir bedel.\""
+    ],
+    secenekler: [
+      { metin: "\"Bu hatalı. Savaşacağım.\"", sonraki: "b3_son_savas", etki: (o) => o.kararlar.push("raven_anladi") },
+      { metin: "\"Belki... haklısın.\"", sonraki: "b3_ihanet" },
+    ]
+  },
+
+  "b3_ihanet": {
+    metin: [
+      "Raven sana bakıyor. Uzun süre.",
+      "\"Hayır.\" diyor sonunda. \"Gözlerinde inanç yok. Beni durdurmaya çalışıyorsun.\"",
+      "<span class='kirmizi'>\"Pişman olacaksın.\"</span>"
+    ],
+    secenekler: [{ metin: "Savaş — başka yol yok", sonraki: "b3_son_savas" }]
+  },
+
+  "b3_son_savas": {
+    tip: "savas",
+    dusman: "birlik_lideri",
+    metin: [
+      "<span class='cesur'>Raven pelerini çıkarıyor.</span> Altında kristal zırh — babanın formülüyle güçlendirilmiş.",
+      "\"Sen... babanın gururusun. Ama bu seni kurtarmaz.\"",
+      "<span class='kirmizi'>Son savaş başlıyor.</span>"
+    ],
+    sahneSonrasi: "b3_zafer",
+    olumSahnesi: "b3_olum"
+  },
+
+  "b3_olum": {
+    metin: [
+      "Raven son darbeyi indiriyor. Yere çöküyorsun.",
+      "Son gördüğün şey babanın yüzü. Çaresiz.",
+      "<span class='kirmizi'>Formül Raven'ın eline geçiyor.</span>"
+    ],
+    secenekler: [{ metin: "[ Tekrar Dene — Daha Güçlü Dön ]", sonraki: "b3_giris", etki: (o) => { o.can=100; } }]
+  },
+
+  "b3_zafer": {
+    metin: [
+      "<span class='yesil'>Raven yere düşüyor.</span> Maske çatlıyor.",
+      "Altındaki yüz... <span class='vurgu'>genç.</span> Çok genç. Ve yorgun. Yılların yorgunluğu.",
+      "\"Bitti mi?\" diye fısıldıyor.",
+      "Babanın sesi arkandan: \"Henüz değil. Formülü yok etmemiz lazım.\"",
+      "Raven seni tutuyor. \"Bırak beni... yok edeyim. Bu... benim yapabileceğim son iyi şey.\""
+    ],
+    secenekler: [
+      { metin: "Raven'a güven", sonraki: "son_iyi" },
+      { metin: "Formülü kendin yok et", sonraki: "son_kendi" },
+    ]
+  },
+
+  "son_iyi": {
+    metin: [
+      "Raven elini kristallere uzatıyor. Işık patlaması.",
+      "<span class='cesur'>Tüm kristaller kararıyor.</span> Formül yok oldu.",
+      "Raven göz kapaklarını kapıyor. \"Teşekkür ederim... Aldric.\"",
+      "Baban diz çöküyor yanına. Eski öğrencisinin yanına.",
+      "Ve sen orada, <span class='vurgu'>kulenin derinliklerinde</span>, her şeyin nasıl hem bittiğini hem de başladığını hissediyorsun.",
+    ],
+    secenekler: [{ metin: "[ FİNAL — Oyunu Baştan Oyna ]", sonraki: "baslangic", etki: resetOyuncu }]
+  },
+
+  "son_kendi": {
+    metin: [
+      "Kristallere yumruğunu vuruyorsun. <span class='kirmizi'>Acı.</span> Ama devam ediyorsun.",
+      "Işık patlaması. Yere çöküyorsun.",
+      "Baban koşuyor yanına. \"Kael! Kael—\" Gözlerini açıyorsun.",
+      "\"Bitti mi?\" diyorsun. Baban başını sallıyor. <span class='yesil'>\"Bitti.\"</span>",
+      "Raven karanlıkta sessizce duruyor. Belki ağlıyor. Belki değil.",
+    ],
+    secenekler: [{ metin: "[ FİNAL — Oyunu Baştan Oyna ]", sonraki: "baslangic", etki: resetOyuncu }]
+  },
+
 };
 
-// ── YARDIMCI FONKSİYONLAR ──────────────────────────────────────
-
-// Durum çubuğunu güncelle
-function durumGuncelle() {
-  document.getElementById("d-isim").textContent = oyuncu.isim;
-  document.getElementById("d-can").textContent = "❤ " + oyuncu.can;
-  document.getElementById("d-envanter").textContent = oyuncu.envanter.join(", ");
-  // Cesaret yıldızları
-  const yildiz = "★".repeat(oyuncu.cesaret) + "☆".repeat(5 - oyuncu.cesaret);
-  document.getElementById("d-cesaret").textContent = yildiz;
+// ── OYUNCUYU SIFIRLA ─────────────────────────────────────────
+function resetOyuncu(o) {
+  o.can = 100; o.maxCan = 100; o.cesaret = 3;
+  o.envanter = ["Fener","Hançer"]; o.kararlar = [];
+  o.saldiriGucu = 18; o.savunma = 5;
 }
 
-// Sahneyi yükle
+// ── DURUM ÇUBUĞUNU GÜNCELLE ──────────────────────────────────
+function durumGuncelle() {
+  document.getElementById("d-isim").textContent = oyuncu.isim;
+  document.getElementById("d-can-yazi").textContent = oyuncu.can;
+  document.getElementById("d-envanter").textContent = oyuncu.envanter.join(", ");
+  const yildiz = "★".repeat(oyuncu.cesaret) + "☆".repeat(5 - oyuncu.cesaret);
+  document.getElementById("d-cesaret").textContent = yildiz;
+  // Can bar rengi
+  const bar = document.getElementById("can-bar");
+  const yuzde = (oyuncu.can / oyuncu.maxCan) * 100;
+  bar.style.width = yuzde + "%";
+  if (yuzde > 60) bar.style.background = "#6abf69";
+  else if (yuzde > 30) bar.style.background = "#f0a500";
+  else bar.style.background = "#e05555";
+}
+
+// ── SAVAŞ SİSTEMİ ────────────────────────────────────────────
+/*
+  SAVAŞ NASIL ÇALIŞIR?
+
+  Her tur oyuncu 3 hamleden birini seçer:
+  ⚔ SALDIR   → Düşmana hasar ver, ama karşılık alırsın
+  🛡 SAVUN    → Az hasar ver, ama düşman da az vurur
+  🎯 STRATEJİ → Düşmanın zayıflığını bul, fazla hasar ver
+
+  Düşmanın zayıflığı seçtiğin hamleyle eşleşirse BONUS hasar!
+  Yanlış hamle seçersen düşman güçlü vurur.
+*/
+
+function savaSBaslat(sahne) {
+  const dusmanSablonu = dusmanlar[sahne.dusman];
+  // Düşmanın kendi kopyasını oluştur (orijinalini bozma)
+  aktifSavas = {
+    dusman: { ...dusmanSablonu, can: dusmanSablonu.can },
+    sahneSonrasi: sahne.sahneSonrasi,
+    olumSahnesi: sahne.olumSahnesi,
+    tur: 1,
+  };
+
+  // Savaş alanını göster
+  const savasAlani = document.getElementById("savas-alani");
+  savasAlani.style.display = "block";
+
+  // Düşman bilgilerini doldur
+  document.getElementById("dusman-isim").textContent = aktifSavas.dusman.isim;
+  document.getElementById("d-can-sayi").textContent = aktifSavas.dusman.can;
+  document.getElementById("d-can-max").textContent = aktifSavas.dusman.maxCan;
+  document.getElementById("dusman-can-bar").style.width = "100%";
+  document.getElementById("dusman-ascii").textContent = aktifSavas.dusman.ascii;
+  document.getElementById("dusman-zayiflik").textContent = aktifSavas.dusman.zayiflikAciklama;
+  document.getElementById("savas-log").innerHTML = "";
+
+  savasLogEkle("Savaş başladı!", "log-sistem");
+}
+
+function savasLogEkle(metin, sinif) {
+  const log = document.getElementById("savas-log");
+  const p = document.createElement("p");
+  p.className = sinif || "";
+  p.innerHTML = metin;
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight; // En alta kaydır
+}
+
+function savasHamle(hamle) {
+  /*
+    hamle = "saldir" / "savun" / "strateji"
+
+    HASAR HESABI:
+    - Temel oyuncu hasarı: oyuncu.saldiriGucu ± biraz rastgelelik
+    - Temel düşman hasarı: dusman.saldiri ± biraz rastgelelik
+    - Zayıflık bonusu: hasar 2 katına çıkar
+    - Savunma: düşman hasarından oyuncu.savunma kadar düşer
+  */
+
+  const d = aktifSavas.dusman;
+
+  // Biraz rastgelelik ekle (oyun tekrarlı hissettirmesin)
+  // Math.random() → 0 ile 1 arası rastgele sayı
+  const rastgele = () => Math.floor(Math.random() * 8) - 3; // -3 ile +4 arası
+
+  let oyuncuHasar = oyuncu.saldiriGucu + rastgele();
+  let dusmanHasar = d.saldiri + rastgele();
+  let hamleAciklama = "";
+  let hamleLogSinif = "";
+
+  if (hamle === "saldir") {
+    hamleAciklama = "Direkt saldırı!";
+    hamleLogSinif = "log-hasar";
+    // Zayıflık kontrolü
+    if (d.zayiflik === "saldir") {
+      oyuncuHasar = Math.floor(oyuncuHasar * 2);
+      hamleAciklama += " <span class='yesil'>ZAYIF NOKTA!</span> ×2 hasar!";
+    }
+  } else if (hamle === "savun") {
+    hamleAciklama = "Savunmaya geçtin.";
+    hamleLogSinif = "log-savun";
+    oyuncuHasar = Math.floor(oyuncuHasar * 0.6); // Az hasar ver
+    dusmanHasar = Math.max(0, dusmanHasar - oyuncu.savunma - 8); // Düşmandan az al
+    if (d.zayiflik === "savun") {
+      oyuncuHasar = Math.floor(oyuncuHasar * 2.5);
+      hamleAciklama += " <span class='yesil'>ZAYIF NOKTA!</span> Düşman kendini kaybetti!";
+    }
+  } else if (hamle === "strateji") {
+    hamleAciklama = "Stratejik hamle!";
+    hamleLogSinif = "log-strateji";
+    if (d.zayiflik === "strateji") {
+      oyuncuHasar = Math.floor(oyuncuHasar * 2.2);
+      hamleAciklama += " <span class='yesil'>ZAYIF NOKTA!</span> Mükemmel!";
+    } else {
+      // Yanlış strateji: düşman daha sert vurur
+      dusmanHasar = Math.floor(dusmanHasar * 1.4);
+      hamleAciklama += " <span class='kirmizi'>Yanlış hamle! Düşman fırsatı kullandı.</span>";
+    }
+  }
+
+  // Sınır: hasar 0'dan az olamaz
+  oyuncuHasar = Math.max(1, oyuncuHasar);
+  dusmanHasar = Math.max(0, dusmanHasar);
+
+  // Hasarları uygula
+  d.can = Math.max(0, d.can - oyuncuHasar);
+  oyuncu.can = Math.max(0, oyuncu.can - dusmanHasar);
+
+  // Log'a yaz
+  savasLogEkle(`Tur ${aktifSavas.tur}: ${hamleAciklama}`, hamleLogSinif);
+  savasLogEkle(`→ Sen: <span class='yesil'>-${oyuncuHasar} hasar verdin</span> | Aldın: <span class='kirmizi'>-${dusmanHasar}</span>`, "");
+
+  // Düşman can barını güncelle
+  const dYuzde = (d.can / d.maxCan) * 100;
+  document.getElementById("dusman-can-bar").style.width = dYuzde + "%";
+  document.getElementById("d-can-sayi").textContent = d.can;
+
+  // Oyuncu can barını güncelle
+  durumGuncelle();
+
+  // Hasar animasyonu
+  if (dusmanHasar > 0) {
+    document.getElementById("oyun-kutusu").classList.add("sarsil");
+    setTimeout(() => document.getElementById("oyun-kutusu").classList.remove("sarsil"), 300);
+  }
+
+  aktifSavas.tur++;
+
+  // Sonucu kontrol et
+  if (d.can <= 0) {
+    // DÜŞMAN ÖLDÜ
+    setTimeout(() => savasKazan(), 600);
+  } else if (oyuncu.can <= 0) {
+    // OYUNCU ÖLDÜ
+    setTimeout(() => savasKaybe(), 600);
+  }
+  // İkisi de hayattaysa savaş devam eder (butonlar zaten hâlâ ekranda)
+}
+
+function savasKazan() {
+  savasLogEkle(`<span class='yesil'>⚔ ZAFER! ${aktifSavas.dusman.olumMetni}</span>`, "log-sistem");
+  document.getElementById("savas-alani").style.display = "none";
+  aktifSavas = null;
+  sahneGecis(arguments.callee._sahneSonrasi || _sahneSonrasiTemp);
+}
+
+// Geçici çözüm: sahneSonrasi'nı sakla
+let _sahneSonrasiTemp = "";
+
+function savasKazan2(sahneSonrasi) {
+  savasLogEkle(`<span class='yesil'>⚔ ZAFER!</span>`, "log-sistem");
+  setTimeout(() => {
+    document.getElementById("savas-alani").style.display = "none";
+    aktifSavas = null;
+    sahneGecis(sahneSonrasi);
+  }, 1000);
+}
+
+function savasKaybe2(olumSahnesi) {
+  savasLogEkle(`<span class='kirmizi'>💀 DÜŞTÜN.</span>`, "log-sistem");
+  oyuncu.can = 100; // Savaş sonrası can sıfırla
+  setTimeout(() => {
+    document.getElementById("savas-alani").style.display = "none";
+    aktifSavas = null;
+    sahneGecis(olumSahnesi);
+  }, 1000);
+}
+
+// ── SAHNE YÜKLEYİCİ ─────────────────────────────────────────
 function sahneYukle(sahneAdi) {
   const sahne = sahneler[sahneAdi];
-  if (!sahne) { console.error("Sahne bulunamadı:", sahneAdi); return; }
+  if (!sahne) { console.error("Sahne yok:", sahneAdi); return; }
 
   const metinKutusu = document.getElementById("metin-kutusu");
   const seceneklerDiv = document.getElementById("secenekler");
-
-  // Mevcut içeriği temizle
   metinKutusu.innerHTML = "";
   seceneklerDiv.innerHTML = "";
 
-  // Paragrafları ekle (her biri biraz gecikmeli görünsün)
-  sahne.metin.forEach((paragraf, index) => {
-    const p = document.createElement("p");
-    p.innerHTML = paragraf;
-    // Her paragraf sırayla, 0.2sn arayla belirsin
-    p.style.animationDelay = (index * 0.2) + "s";
-    metinKutusu.appendChild(p);
-  });
-
-  // Seçenekleri ekle
-  sahne.secenekler.forEach((secenek, index) => {
-    // Koşul varsa kontrol et
-    if (secenek.kosul && !secenek.kosul(oyuncu)) return;
-
-    const btn = document.createElement("button");
-    btn.className = "secenek-btn";
-    btn.textContent = secenek.metin;
-    // Her buton sırayla, metinden sonra belirsin
-    btn.style.animationDelay = (sahne.metin.length * 0.2 + index * 0.15 + 0.3) + "s";
-
-    // Tıklanınca ne olacak
-    btn.addEventListener("click", () => {
-      // Önce etki fonksiyonu varsa çalıştır (oyuncuyu değiştir)
-      if (secenek.etki) secenek.etki(oyuncu);
-      // Sonra sahneyi geçiş efektiyle değiştir
-      sahneGecis(secenek.sonraki);
+  // Savaş sahnesi mi?
+  if (sahne.tip === "savas") {
+    // Önce metni göster
+    sahne.metin.forEach((p, i) => {
+      const el = document.createElement("p");
+      el.innerHTML = p;
+      el.style.animationDelay = (i * 0.2) + "s";
+      metinKutusu.appendChild(el);
     });
 
+    // Savaşı başlat
+    savaSBaslat(sahne);
+
+    // Savaş butonlarını ekle
+    const sahneSonrasi = sahne.sahneSonrasi;
+    const olumSahnesi = sahne.olumSahnesi;
+
+    const hamleler = [
+      { id: "saldir",   metin: "⚔ Saldır — Direkt hasar ver",         sinif: "saldir"   },
+      { id: "savun",    metin: "🛡 Savun — Hasarı azalt, karşılık ver", sinif: "savun"    },
+      { id: "strateji", metin: "🎯 Strateji — Zayıflığı bul ve vur",   sinif: "strateji" },
+    ];
+
+    hamleler.forEach((h, i) => {
+      const btn = document.createElement("button");
+      btn.className = "secenek-btn " + h.sinif;
+      btn.textContent = h.metin;
+      btn.style.animationDelay = (sahne.metin.length * 0.2 + i * 0.15 + 0.3) + "s";
+      btn.addEventListener("click", () => {
+        // Savaş bittiyse tıklama
+        if (!aktifSavas) return;
+        // Butonu geçici devre dışı bırak (çift tıklamayı önle)
+        seceneklerDiv.querySelectorAll("button").forEach(b => b.disabled = true);
+        savasHamleYap(h.id, sahneSonrasi, olumSahnesi, seceneklerDiv);
+      });
+      seceneklerDiv.appendChild(btn);
+    });
+
+    durumGuncelle();
+    return;
+  }
+
+  // Normal sahne
+  sahne.metin.forEach((p, i) => {
+    const el = document.createElement("p");
+    el.innerHTML = p;
+    el.style.animationDelay = (i * 0.2) + "s";
+    metinKutusu.appendChild(el);
+  });
+
+  sahne.secenekler.forEach((s, i) => {
+    if (s.kosul && !s.kosul(oyuncu)) return;
+    const btn = document.createElement("button");
+    btn.className = "secenek-btn";
+    btn.innerHTML = s.metin;
+    btn.style.animationDelay = (sahne.metin.length * 0.2 + i * 0.15 + 0.3) + "s";
+    btn.addEventListener("click", () => {
+      if (s.etki) s.etki(oyuncu);
+      sahneGecis(s.sonraki);
+    });
     seceneklerDiv.appendChild(btn);
   });
 
   durumGuncelle();
 }
 
-// Sahne geçiş efekti: ekran kararır, sahne değişir, aydınlanır
+// Savaş hamlesini işle ve savaşın bitip bitmediğine bak
+function savasHamleYap(hamle, sahneSonrasi, olumSahnesi, seceneklerDiv) {
+  savasHamle(hamle);
+
+  // Savaş bittiyse butonları kaldır
+  if (!aktifSavas) return;
+
+  const d = aktifSavas.dusman;
+  if (d.can <= 0) {
+    savasKazan2(sahneSonrasi);
+  } else if (oyuncu.can <= 0) {
+    savasKaybe2(olumSahnesi);
+  } else {
+    // Savaş devam ediyor — butonları tekrar aktif et
+    setTimeout(() => {
+      seceneklerDiv.querySelectorAll("button").forEach(b => b.disabled = false);
+    }, 400);
+  }
+}
+
+// ── SAHNE GEÇİŞİ ────────────────────────────────────────────
 function sahneGecis(sahneAdi) {
   const perde = document.getElementById("gecis-perdesi");
-  perde.style.opacity = "1";          // Ekran kararır
-  perde.style.pointerEvents = "all";   // Tıklamaları engelle
-
+  perde.style.opacity = "1";
+  perde.style.pointerEvents = "all";
   setTimeout(() => {
-    sahneYukle(sahneAdi);              // Yeni sahneyi yükle
-    perde.style.opacity = "0";         // Ekran aydınlanır
+    sahneYukle(sahneAdi);
+    perde.style.opacity = "0";
     perde.style.pointerEvents = "none";
-    window.scrollTo({ top: 0, behavior: "smooth" }); // Sayfanın başına çık
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, 400);
 }
 
-// ── OYUNU BAŞLAT ───────────────────────────────────────────────
+// ── BAŞLAT ───────────────────────────────────────────────────
 sahneYukle("baslangic");
 </script>
 </body>
