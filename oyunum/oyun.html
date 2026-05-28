@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unutulmuş Kule</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ── TEMEL AYARLAR ──────────────────────────────────────────────
+     * { ... } : Sayfadaki HER elemana bu kuralları uygula
+     box-sizing: border-box → genişlik hesabı padding dahil yapılsın
+     margin/padding 0 → tarayıcının kendi boşluklarını sıfırla
+  */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* body = sayfanın tamamı
+     min-height: 100vh → en az ekran yüksekliği kadar olsun
+     display: flex + align-items/justify-content → içeriği ortala
+  */
+  body {
+    min-height: 100vh;
+    background: #0a0a0f;
+    color: #d4c9a8;
+    font-family: 'Crimson Text', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    /* Arka plan deseni: çok ince bir ızgara */
+    background-image:
+      linear-gradient(rgba(180,150,80,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180,150,80,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Ana kapsayıcı kutu */
+  #oyun-kutusu {
+    max-width: 720px;
+    width: 100%;
+  }
+
+  /* ── BAŞLIK ALANI ─────────────────────────────────────────────── */
+  #baslik {
+    text-align: center;
+    margin-bottom: 40px;
+    opacity: 0;  /* Başta görünmez, sonra animasyonla çıkacak */
+    animation: yuksel 1.2s ease forwards;  /* 1.2 saniyede yukarı çıkarak belir */
+  }
+
+  #baslik h1 {
+    font-family: 'Cinzel', serif;  /* Fantastik tarz serif font */
+    font-size: clamp(28px, 5vw, 48px);  /* Ekran boyutuna göre otomatik küçül/büyü */
+    color: #c9a84c;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  #baslik .alt-baslik {
+    font-style: italic;
+    color: #7a6e5a;
+    font-size: 15px;
+    letter-spacing: 2px;
+  }
+
+  /* Başlık altındaki ince altın çizgi */
+  .ayirici {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+    margin: 16px auto;
+  }
+
+  /* ── HİKAYE METİN KUTUSU ─────────────────────────────────────── */
+  #metin-kutusu {
+    background: rgba(20, 17, 10, 0.85);
+    border: 1px solid rgba(180, 150, 60, 0.2);
+    border-radius: 4px;
+    padding: 36px 40px;
+    margin-bottom: 28px;
+    min-height: 180px;
+    position: relative;
+    /* Köşe süsü için */
+  }
+
+  /* Metin kutusunun köşe süsleri (CSS ile çizilen dekorasyon) */
+  #metin-kutusu::before,
+  #metin-kutusu::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: #c9a84c;
+    border-style: solid;
+    opacity: 0.5;
+  }
+  #metin-kutusu::before { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
+  #metin-kutusu::after  { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+
+  /* Metin içindeki paragraf */
+  #metin-kutusu p {
+    margin-bottom: 14px;
+    opacity: 0;
+    animation: goster 0.6s ease forwards;
+  }
+
+  /* İtalik vurgu için */
+  .vurgu { color: #c9a84c; font-style: italic; }
+  .cesur  { color: #e8d9b0; font-weight: 600; }
+
+  /* ── SEÇENEKLER ALANI ────────────────────────────────────────── */
+  #secenekler {
+    display: flex;
+    flex-direction: column;  /* Butonları alt alta sırala */
+    gap: 10px;               /* Butonlar arası boşluk */
+  }
+
+  /* Her bir seçenek butonu */
+  .secenek-btn {
+    background: transparent;
+    border: 1px solid rgba(180, 150, 60, 0.3);
+    color: #d4c9a8;
+    font-family: 'Crimson Text', serif;
+    font-size: 16px;
+    padding: 14px 24px;
+    text-align: left;
+    cursor: pointer;         /* Fare üstüne gelince el işareti */
+    border-radius: 2px;
+    transition: all 0.25s ease;  /* Hover geçişi yumuşak olsun */
+    position: relative;
+    opacity: 0;
+    animation: goster 0.5s ease forwards;
+    /* Her butona farklı gecikme, aşağıda JS ile verilecek */
+  }
+
+  /* Butonun solundaki › işareti */
+  .secenek-btn::before {
+    content: '›';
+    color: #c9a84c;
+    margin-right: 12px;
+    font-size: 20px;
+    transition: transform 0.2s ease;
+    display: inline-block;
+  }
+
+  /* Fare üstüne gelince (hover durumu) */
+  .secenek-btn:hover {
+    background: rgba(180, 150, 60, 0.08);
+    border-color: rgba(180, 150, 60, 0.6);
+    color: #e8d9b0;
+    padding-left: 32px;  /* Hafifçe sağa kaydır */
+  }
+
+  .secenek-btn:hover::before {
+    transform: translateX(4px);  /* Ok biraz öne gitsin */
+  }
+
+  /* Tıklanan buton efekti */
+  .secenek-btn:active {
+    transform: scale(0.99);
+  }
+
+  /* ── ENVANTER / DURUM ÇUBUĞU ─────────────────────────────────── */
+  #durum-cubugu {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(180, 150, 60, 0.15);
+    font-size: 13px;
+    color: #7a6e5a;
+    letter-spacing: 1px;
+    font-family: 'Cinzel', serif;
+  }
+
+  .durum-item { display: flex; align-items: center; gap: 6px; }
+  .durum-deger { color: #c9a84c; }
+
+  /* ── GEÇİŞ EFEKTİ ────────────────────────────────────────────── */
+  /* Ekran kararma efekti (sahne değişiminde) */
+  #gecis-perdesi {
+    position: fixed;
+    inset: 0;  /* top/right/bottom/left = 0 (kısayol) */
+    background: #0a0a0f;
+    pointer-events: none;  /* Tıklamaları engelleme */
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 100;
+  }
+
+  /* ── ANİMASYONLAR ────────────────────────────────────────────── */
+  /* @keyframes: animasyon adımlarını tanımlar */
+  @keyframes yuksel {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes goster {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Titreyen mum ışığı efekti (arka plan rengi için) */
+  @keyframes titrek {
+    0%, 100% { opacity: 0.9; }
+    50%       { opacity: 0.7; }
+  }
+
+  /* ── MOBİL UYUM ──────────────────────────────────────────────── */
+  @media (max-width: 600px) {
+    #metin-kutusu { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sahne geçiş perdesi: görünmez, animasyonla aktif hale gelir -->
+<div id="gecis-perdesi"></div>
+
+<!-- Ana oyun kutusu -->
+<div id="oyun-kutusu">
+
+  <!-- Başlık -->
+  <div id="baslik">
+    <div class="alt-baslik">Bir Metin Macerası</div>
+    <div class="ayirici"></div>
+    <h1>Unutulmuş Kule</h1>
+    <div class="ayirici"></div>
+  </div>
+
+  <!-- Durum çubuğu: oyuncu bilgileri -->
+  <div id="durum-cubugu">
+    <div class="durum-item">KAHRAMAN: <span class="durum-deger" id="d-isim">Kael</span></div>
+    <div class="durum-item">CAN: <span class="durum-deger" id="d-can">❤ 100</span></div>
+    <div class="durum-item">CESARET: <span class="durum-deger" id="d-cesaret">★★★☆☆</span></div>
+    <div class="durum-item">ENVANTER: <span class="durum-deger" id="d-envanter">Fener, Hançer</span></div>
+  </div>
+
+  <!-- Hikaye metni buraya yazılacak (JS dolduracak) -->
+  <div id="metin-kutusu">
+    <!-- JavaScript bu alanı dolduracak -->
+  </div>
+
+  <!-- Seçenek butonları buraya gelecek (JS dolduracak) -->
+  <div id="secenekler">
+    <!-- JavaScript bu alanı dolduracak -->
+  </div>
+
+</div>
+
+<script>
+/*
+  ═══════════════════════════════════════════════════════════════
+  OYUNUN BEYNİ: JavaScript
+  ═══════════════════════════════════════════════════════════════
+
+  Metin macerası nasıl çalışır?
+  - Her "sahne" bir nesne (object) olarak tanımlanır
+  - Her sahnede: metin ve seçenekler var
+  - Her seçenek bir sonraki sahneye yönlendirir
+  - Bu yapıya "düğüm-bağlantı" (node-link) denir
+*/
+
+// ── OYUNCU DURUMU ──────────────────────────────────────────────
+// Bu nesne oyuncunun tüm bilgilerini tutar
+// Oyun boyunca değişebilir
+const oyuncu = {
+  isim: "Kael",
+  can: 100,
+  cesaret: 3,       // 1-5 arası
+  envanter: ["Fener", "Hançer"],
+  kararlar: [],     // Verilen kararları hatırlıyoruz (ileride hikayeyi etkiler)
+};
+
+// ── TÜM SAHNELER ───────────────────────────────────────────────
+/*
+  YAPISI:
+  "sahne_adi": {
+    metin: ["Paragraf 1", "Paragraf 2", ...],
+    secenekler: [
+      { metin: "Buton yazısı", sonraki: "gidilecek_sahne" },
+      ...
+    ]
+  }
+
+  Özel komutlar:
+  - kosul: (oyuncu) => true/false  →  Sadece koşul sağlanırsa göster
+  - etki: (oyuncu) => { ... }      →  Seçilince oyuncuyu değiştir
+*/
+const sahneler = {
+
+  "baslangic": {
+    metin: [
+      "Sonbaharın soğuk nefesi ensende. <span class='vurgu'>Gri gökyüzü</span> altında, yıllar önce terk edilmiş bir kule yükseliyor karşında.",
+      "Bu kule... <span class='cesur'>Babanın kaybolduğu yer.</span> Köylüler yaklaşmaz buraya. \"Lanetli\" derler. Sen biliyorsun ki, gerçek cevap içeride.",
+      "Kulede üç kapı var: solda <span class='vurgu'>çürük ahşap bir kapı</span>, ortada <span class='vurgu'>demir zincirli büyük kapı</span>, sağda ise <span class='vurgu'>gizlenmiş küçük bir pencere</span>."
+    ],
+    secenekler: [
+      { metin: "Ahşap kapıdan içeri gir", sonraki: "ahsap_kapi" },
+      { metin: "Demir zinciri kır", sonraki: "demir_kapi", etki: (o) => { o.cesaret = Math.min(5, o.cesaret + 1); } },
+      { metin: "Pencereden dikkatlice bak", sonraki: "pencere_goz" },
+    ]
+  },
+
+  "ahsap_kapi": {
+    metin: [
+      "Kapıyı itince <span class='vurgu'>gıcırdayan bir ses</span> tüm ormanı doldurur. İçerisi karanlık, ama fenerin sarı ışığı bir koridoru aydınlatıyor.",
+      "Duvarlar nemli. Bir zamanlar kitaplık olan raflar artık çürümüş. Yerdeki toz üzerinde <span class='cesur'>ayak izleri</span> var. Taze izler.",
+      "Biri yakın zamanda buraya gelmiş..."
+    ],
+    secenekler: [
+      { metin: "İzleri takip et", sonraki: "izleri_takip", etki: (o) => o.kararlar.push("izleri_takip") },
+      { metin: "Önce rafları incele", sonraki: "raflari_incele" },
+      { metin: "Geri dön, başka yolu dene", sonraki: "baslangic" },
+    ]
+  },
+
+  "demir_kapi": {
+    metin: [
+      "Zincire elini atıyorsun. Soğuk demir avucunu kesecek gibi. Bir nefes alıp <span class='vurgu'>tüm gücünle</span> çekiyorsun.",
+      "Zincir kırılmıyor. Ama bir halkası yerinden oynuyor. Dikkatle bakınca halkanın üzerinde <span class='cesur'>bir sembol</span> görüyorsun — babanın mektuplarındaki mühürle aynı.",
+      "Bu tesadüf olamaz."
+    ],
+    secenekler: [
+      { metin: "Sembolü daha yakından incele", sonraki: "sembol_incele", etki: (o) => o.kararlar.push("sembol_gordu") },
+      { metin: "Hançerinle halkanın kilitini zorla", sonraki: "kilit_zorla" },
+      { metin: "Geri çekil, başka yola bak", sonraki: "baslangic" },
+    ]
+  },
+
+  "pencere_goz": {
+    metin: [
+      "Eğilip içeriye bakıyorsun. <span class='vurgu'>Toz dolu</span> bir oda. Ancak...",
+      "İçeride bir <span class='cesur'>ışık titriyor.</span> Mum. Biri orada.",
+      "Ve o biri de <span class='vurgu'>seni görüyor.</span> Gözler... tanıdık. Bir an için nefesin kesiliyor."
+    ],
+    secenekler: [
+      { metin: "Pencereden sızmaya çalış", sonraki: "pencereden_gir", etki: (o) => o.kararlar.push("pencere_secti") },
+      { metin: "Sesi duyurarak kapıya vur", sonraki: "kapiyi_vur" },
+      { metin: "Geri çekil ve gözlemle", sonraki: "gozle" },
+    ]
+  },
+
+  "izleri_takip": {
+    metin: [
+      "İzler koridorun sonuna, <span class='vurgu'>dar bir merdivene</span> çıkıyor. Fenerini kaldırıyorsun.",
+      "Merdivenin başında bir <span class='cesur'>pelerin parçası</span> var. Mor kadife. Babana ait.",
+      "Yüreğin hızlanıyor. O burada. Ya da birisi onu buraya getirdi."
+    ],
+    secenekler: [
+      { metin: "Merdiveni çık", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("merdiven_cikti"); } },
+      { metin: "Pelerin parçasını al ve incele", sonraki: "pelerin_incele" },
+    ]
+  },
+
+  "raflari_incele": {
+    metin: [
+      "Çürümüş kitapların arasında <span class='vurgu'>bir deri cilt</span> dikkatini çekiyor. Nemden bozulmamış, sanki korunmuş.",
+      "İçinde <span class='cesur'>babanın el yazısı:</span> \"Kael, eğer buraya ulaştıysan, zincirli kapının sırrı senin adındadır. K-A-E-L. Her harf bir halka.\"",
+      "Ellerinde titreyerek kitabı kapatıyorsun. Seni bekliyordu."
+    ],
+    secenekler: [
+      { metin: "Kitabı yanına al ve zincirli kapıya git", sonraki: "demir_kapi_coz", etki: (o) => { o.envanter.push("Babanın Kitabı"); o.kararlar.push("kitap_buldu"); } },
+      { metin: "Devam et, izleri takip et", sonraki: "ahsap_kapi" },
+    ]
+  },
+
+  "sembol_incele": {
+    metin: [
+      "Sembol dört harften oluşan, birbirine geçmiş bir monogram. <span class='cesur'>K... A... E... L.</span>",
+      "Senin adın.",
+      "Baban bu kilidi <span class='vurgu'>sen için</span> hazırlamış. Bir şekilde biliyordu sen geleceğini."
+    ],
+    secenekler: [
+      { metin: "Her harfi sırayla bas", sonraki: "demir_kapi_acildi", etki: (o) => o.kararlar.push("sifre_cozdu") },
+      { metin: "Emin olamıyorsun, önce içeri bak", sonraki: "pencere_goz" },
+    ]
+  },
+
+  "kilit_zorla": {
+    metin: [
+      "Hançerin ucunu kilide sokuyorsun. Zorluyor, döndürüyorsun...",
+      "<span class='vurgu'>Çat.</span> Hançerin ucu kırılıyor. Kilit kıpırdamıyor.",
+      "Hem hançerin hasar gördü, hem de vakit kaybettin."
+    ],
+    secenekler: [
+      { metin: "Farklı bir yaklaşım dene", sonraki: "baslangic", etki: (o) => { o.envanter = o.envanter.map(e => e === "Hançer" ? "Kırık Hançer" : e); } },
+    ]
+  },
+
+  "pencereden_gir": {
+    metin: [
+      "Kendini pencereden içeri atıyorsun. Ayakların yere değince bir ses duyulyor.",
+      "Döndüğünde karşında <span class='cesur'>yaşlı bir adam</span> duruyor. Titreyen elleriyle bir mum tutuyor.",
+      "\"Sen... Kael misin?\" diyor titreyerek. \"Seni tanıyorum. Resimdekiyle aynısın.\""
+    ],
+    secenekler: [
+      { metin: "\"Evet. Ve sen kimsin?\"", sonraki: "yasli_adam_tanisma" },
+      { metin: "\"Babam nerede?\" diye sor", sonraki: "baba_nerede_sor" },
+    ]
+  },
+
+  "kapiyi_vur": {
+    metin: [
+      "\"İçeride kimse var!\" diye bağırıyorsun. Sesler kuleye yayılıyor.",
+      "Uzun bir sessizlik. Sonra kapı... <span class='vurgu'>içeriden açılıyor.</span>",
+      "Yaşlı bir el kapıyı tutuyor. Bir göz seni süzüyor."
+    ],
+    secenekler: [
+      { metin: "İçeri gir", sonraki: "pencereden_gir" },
+      { metin: "\"Ben Kael. Büyücü Aldric'in oğluyum.\"", sonraki: "yasli_adam_tanisma" },
+    ]
+  },
+
+  "gozle": {
+    metin: [
+      "Geri çekilip ağaçların arasına saklanıyorsun. Bekleyip izliyorsun.",
+      "Birkaç dakika sonra penceredeki ışık sönüyor. Ve <span class='cesur'>arka kapıdan biri çıkıyor.</span>",
+      "Yaşlı, yorgun görünümlü biri. Bir şeyler mırıldanıyor kendi kendine. Elinde babanın tanıdık <span class='vurgu'>mor pelerini</span> var."
+    ],
+    secenekler: [
+      { metin: "Adamı dur", sonraki: "yasli_adam_dur", etki: (o) => { o.cesaret = Math.min(5, o.cesaret + 1); } },
+      { metin: "Sessizce takip et", sonraki: "yasli_adam_takip" },
+    ]
+  },
+
+  "demir_kapi_coz": {
+    metin: [
+      "Kitaptaki ipucunu kullanarak dört halkayı sırayla döndürüyorsun: <span class='vurgu'>K... A... E... L...</span>",
+      "<span class='cesur'>Tık. Tık. Tık. Tık.</span>",
+      "Zincir kendiliğinden düşüyor. Demir kapı içe doğru açılıyor. Basamaklar aşağı iniyor."
+    ],
+    secenekler: [
+      { metin: "Merdivenden in", sonraki: "bodrum" },
+    ]
+  },
+
+  "demir_kapi_acildi": {
+    metin: [
+      "Harfleri basmak için elini uzatıyorsun. K... A... E... L...",
+      "Her harfte bir tık sesi. Dördüncüde zincir çözülüyor.",
+      "Kapı açılıyor. İçeriden <span class='vurgu'>serin, toprak kokusu</span> geliyor."
+    ],
+    secenekler: [
+      { metin: "İçeri gir", sonraki: "bodrum" },
+    ]
+  },
+
+  "pelerin_incele": {
+    metin: [
+      "Pelerin parçasını avucuna alıyorsun. <span class='vurgu'>Hâlâ sıcak.</span>",
+      "Altında küçük bir not kâğıdı var. Kötü yazılmış, aceleyle: <span class='cesur'>\"3. kat. Güvenli yer. — A\"</span>",
+      "A. Aldric. Baban."
+    ],
+    secenekler: [
+      { metin: "Koş, merdivenden çık", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("notu_aldi"); o.envanter.push("Babanın Notu"); } },
+    ]
+  },
+
+  "yasli_adam_tanisma": {
+    metin: [
+      "Adam seni görünce gözleri doluyor. \"Aldric'in oğlu... sonunda geldin.\"",
+      "\"Ben Maron. Kulenin eski bekçisi. Babanı... <span class='vurgu'>sakladım</span>. Onu bulmak isteyenlerden.\"",
+      "\"Nerede?\" diyorsun. Sesi alçalıyor: \"<span class='cesur'>Üstte. Ama tehlikeli. Onu koyduklarında zayıftı. Şimdi bilmiyorum...</span>\""
+    ],
+    secenekler: [
+      { metin: "\"Götür beni yanına\"", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("maron_ile_gitti"); } },
+      { metin: "\"Kim istedi onu? Kim peşinde?\"", sonraki: "dusman_hakkinda" },
+    ]
+  },
+
+  "baba_nerede_sor": {
+    metin: [
+      "Adam duraksıyor. Dudakları titriyor.",
+      "\"Yukarıda. Ama... dikkatli ol. Kule onu değiştirdi.\"",
+      "\"Ne demek istiyorsun?\" Adam cevap vermeden içeri giriyor. Takip etmek zorunda kalıyorsun."
+    ],
+    secenekler: [
+      { metin: "Takip et", sonraki: "ust_kat" },
+    ]
+  },
+
+  "yasli_adam_dur": {
+    metin: [
+      "\"Dur!\" diye bağırıyorsun. Adam donup kalıyor. Pelerini sıkıca tutuyor.",
+      "\"Saldırmayacağım,\" diyorsun. \"Ben Kael. Aldric'in oğluyum.\"",
+      "Adam yavaşça dönüyor. Yüzünde <span class='vurgu'>hem korku hem umut</span> var. \"Tanrım... gerçekten geldin.\""
+    ],
+    secenekler: [
+      { metin: "\"Babam nerede?\"", sonraki: "yasli_adam_tanisma" },
+    ]
+  },
+
+  "yasli_adam_takip": {
+    metin: [
+      "Gölgeden gölgeye atlayarak adamı takip ediyorsun. Kule etrafında dolaşıyor.",
+      "Bir yerde duruyor, yere bakıyor. Sonra diz çöküyor ve <span class='vurgu'>taşları kaldırıyor.</span>",
+      "Altında gizli bir kapak. İçerisi karanlık. Adam içine giriyor."
+    ],
+    secenekler: [
+      { metin: "Kapaktan in", sonraki: "bodrum" },
+      { metin: "Adama seslen", sonraki: "yasli_adam_dur" },
+    ]
+  },
+
+  "dusman_hakkinda": {
+    metin: [
+      "Maron derin bir nefes alıyor. \"Birliğin adamları. Babanın keşfettiği <span class='vurgu'>büyü formülünü</span> istediler.\"",
+      "\"O vermedi. Bu yüzden onu... burada sakladım. Dışarısı güvenli değil.\"",
+      "\"Ama artık senin geldiğini biliyorlarsa...\" Adam pencereden bakıyor. \"Gitmemiz lazım.\""
+    ],
+    secenekler: [
+      { metin: "\"Tamam. Götür beni.\"", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("birlik_ogrendi"); } },
+    ]
+  },
+
+  "ust_kat": {
+    metin: [
+      "Merdivenleri çıkıyorsun. Her adımda kule titrercesine inliyor sanki.",
+      "Üçüncü kat. Dar bir koridor. Sonunda <span class='vurgu'>ışık sızan bir kapı.</span>",
+      "Eliyle kapıyı yavaşça itiyorsun..."
+    ],
+    secenekler: [
+      { metin: "Kapıyı aç", sonraki: "baba_ile_kavusma" },
+    ]
+  },
+
+  "bodrum": {
+    metin: [
+      "Basamaklar seni derin, taş duvarlı bir odaya götürüyor.",
+      "Ortada <span class='vurgu'>parlak kristaller</span> içinde donmuş gibi duran bir figür var.",
+      "Babanın yüzü. <span class='cesur'>Hayatta.</span> Ama hareketsiz."
+    ],
+    secenekler: [
+      { metin: "Kristale dokun", sonraki: "kristal_dokunma" },
+      { metin: "Etrafı incele, çözüm ara", sonraki: "bodrum_incele" },
+    ]
+  },
+
+  "kristal_dokunma": {
+    metin: [
+      "Parmaklarını kristale değdiriyorsun. <span class='vurgu'>Elektrik gibi</span> bir his tüm kolunu sarıyor.",
+      "Ve babanın gözleri... açılıyor.",
+      "\"Kael.\" Sesi zayıf, ama o ses. <span class='cesur'>O ses.</span>",
+      "\"Beni buldun.\""
+    ],
+    secenekler: [
+      { metin: "[BÖLÜM SONU — Devam Et]", sonraki: "bolum_sonu" },
+    ]
+  },
+
+  "bodrum_incele": {
+    metin: [
+      "Duvarlarda simgeler. Kristal etrafında <span class='vurgu'>dört taş levha.</span> Her birinde bir sözcük.",
+      "\"Adını söyle, zinciri kır.\"",
+      "Anladın. Bu kristal, içindekinin adını bilen biri tarafından açılabilir."
+    ],
+    secenekler: [
+      { metin: "\"Aldric.\" diye fısılda", sonraki: "kristal_dokunma" },
+    ]
+  },
+
+  "baba_ile_kavusma": {
+    metin: [
+      "Oda. Küçük, nemli. Ama ortasında bir yatak ve onda yatan adam...",
+      "<span class='cesur'>Baban.</span>",
+      "Gözlerini açıyor. Seni görüyor. Sözcükler çıkmıyor ağzından. Sadece elleri uzanıyor sana doğru.",
+      "Yıllar. Yıllar süren arayış. Ve şimdi burada."
+    ],
+    secenekler: [
+      { metin: "[BÖLÜM SONU — Devam Et]", sonraki: "bolum_sonu" },
+    ]
+  },
+
+  "bolum_sonu": {
+    metin: [
+      "<span class='vurgu'>— BİRİNCİ BÖLÜM SONU —</span>",
+      "Babana kavuştun. Ama kule hâlâ sırlarını saklıyor. Birlik yakında burada olacak.",
+      "Ve babanın sana söyleyeceği bir şey var. Bir sır. O büyü formülü hakkında.",
+      "<span class='cesur'>İkinci bölüm yakında...</span>",
+    ],
+    secenekler: [
+      { metin: "Baştan oyna", sonraki: "baslangic", etki: (o) => { o.can=100; o.cesaret=3; o.envanter=["Fener","Hançer"]; o.kararlar=[]; } },
+    ]
+  },
+};
+
+// ── YARDIMCI FONKSİYONLAR ──────────────────────────────────────
+
+// Durum çubuğunu güncelle
+function durumGuncelle() {
+  document.getElementById("d-isim").textContent = oyuncu.isim;
+  document.getElementById("d-can").textContent = "❤ " + oyuncu.can;
+  document.getElementById("d-envanter").textContent = oyuncu.envanter.join(", ");
+  // Cesaret yıldızları
+  const yildiz = "★".repeat(oyuncu.cesaret) + "☆".repeat(5 - oyuncu.cesaret);
+  document.getElementById("d-cesaret").textContent = yildiz;
+}
+
+// Sahneyi yükle
+function sahneYukle(sahneAdi) {
+  const sahne = sahneler[sahneAdi];
+  if (!sahne) { console.error("Sahne bulunamadı:", sahneAdi); return; }
+
+  const metinKutusu = document.getElementById("metin-kutusu");
+  const seceneklerDiv = document.getElementById("secenekler");
+
+  // Mevcut içeriği temizle
+  metinKutusu.innerHTML = "";
+  seceneklerDiv.innerHTML = "";
+
+  // Paragrafları ekle (her biri biraz gecikmeli görünsün)
+  sahne.metin.forEach((paragraf, index) => {
+    const p = document.createElement("p");
+    p.innerHTML = paragraf;
+    // Her paragraf sırayla, 0.2sn arayla belirsin
+    p.style.animationDelay = (index * 0.2) + "s";
+    metinKutusu.appendChild(p);
+  });
+
+  // Seçenekleri ekle
+  sahne.secenekler.forEach((secenek, index) => {
+    // Koşul varsa kontrol et
+    if (secenek.kosul && !secenek.kosul(oyuncu)) return;
+
+    const btn = document.createElement("button");
+    btn.className = "secenek-btn";
+    btn.textContent = secenek.metin;
+    // Her buton sırayla, metinden sonra belirsin
+    btn.style.animationDelay = (sahne.metin.length * 0.2 + index * 0.15 + 0.3) + "s";
+
+    // Tıklanınca ne olacak
+    btn.addEventListener("click", () => {
+      // Önce etki fonksiyonu varsa çalıştır (oyuncuyu değiştir)
+      if (secenek.etki) secenek.etki(oyuncu);
+      // Sonra sahneyi geçiş efektiyle değiştir
+      sahneGecis(secenek.sonraki);
+    });
+
+    seceneklerDiv.appendChild(btn);
+  });
+
+  durumGuncelle();
+}
+
+// Sahne geçiş efekti: ekran kararır, sahne değişir, aydınlanır
+function sahneGecis(sahneAdi) {
+  const perde = document.getElementById("gecis-perdesi");
+  perde.style.opacity = "1";          // Ekran kararır
+  perde.style.pointerEvents = "all";   // Tıklamaları engelle
+
+  setTimeout(() => {
+    sahneYukle(sahneAdi);              // Yeni sahneyi yükle
+    perde.style.opacity = "0";         // Ekran aydınlanır
+    perde.style.pointerEvents = "none";
+    window.scrollTo({ top: 0, behavior: "smooth" }); // Sayfanın başına çık
+  }, 400);
+}
+
+// ── OYUNU BAŞLAT ───────────────────────────────────────────────
+sahneYukle("baslangic");
+</script>
+</body>
+</html>
