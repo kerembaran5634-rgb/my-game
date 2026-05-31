@@ -7,453 +7,425 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-  min-height: 100vh;
-  background: #080810;
-  color: #d4c9a8;
-  font-family: 'Crimson Text', Georgia, serif;
-  font-size: 18px;
-  line-height: 1.8;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 20px;
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(100,60,20,0.15) 0%, transparent 60%),
+  min-height: 100vh; background: #080810; color: #d4c9a8;
+  font-family: 'Crimson Text', Georgia, serif; font-size: 18px; line-height: 1.8;
+  display: flex; align-items: flex-start; justify-content: center; padding: 20px;
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(100,60,20,0.15) 0%, transparent 60%),
     linear-gradient(rgba(180,150,80,0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(180,150,80,0.025) 1px, transparent 1px);
   background-size: 100% 100%, 40px 40px, 40px 40px;
 }
-
 #oyun-kutusu { max-width: 760px; width: 100%; padding-top: 20px; }
 
-/* ══════════════════════════════════════
-   BAŞLIK
-══════════════════════════════════════ */
-#baslik {
-  text-align: center; margin-bottom: 32px;
-  opacity: 0; animation: yuksel 1.4s ease forwards;
-}
-#baslik h1 {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(26px, 5vw, 52px);
-  color: #c9a84c; letter-spacing: 6px; text-transform: uppercase;
-  text-shadow: 0 0 40px rgba(180,130,40,0.4);
-}
-#baslik .alt-baslik { font-style: italic; color: #5a5040; font-size: 14px; letter-spacing: 3px; margin-top: 4px; }
-.ayirici { width: 160px; height: 1px; background: linear-gradient(90deg, transparent, #c9a84c55, #c9a84c, #c9a84c55, transparent); margin: 14px auto; }
+/* ── EKRANLAR (başlangıç, karakter, ana oyun) ── */
+.ekran { display: none; }
+.ekran.aktif { display: block; }
 
-/* ══════════════════════════════════════
-   HARITA / ODA SİSTEMİ
-   Her oda küçük bir kutu, aktif olan vurgulu
-══════════════════════════════════════ */
-#harita-wrap {
-  margin-bottom: 20px;
-  background: rgba(10,8,5,0.9);
-  border: 1px solid rgba(180,150,60,0.15);
-  border-radius: 4px;
-  padding: 14px 18px;
-  opacity: 0; animation: goster 1s 0.5s ease forwards;
+/* ── BAŞLANGIÇ EKRANI ── */
+#basit-ekran {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; gap: 32px;
 }
-#harita-baslik {
+#basit-ekran h1 {
+  font-family: 'Cinzel', serif; font-size: clamp(32px, 6vw, 64px);
+  color: #c9a84c; letter-spacing: 8px; text-transform: uppercase;
+  text-shadow: 0 0 60px rgba(180,130,40,0.5);
+  animation: nabiz 3s ease-in-out infinite;
+}
+@keyframes nabiz { 0%,100%{text-shadow:0 0 40px rgba(180,130,40,0.3)} 50%{text-shadow:0 0 80px rgba(180,130,40,0.7)} }
+#basit-ekran .altyazi { font-style: italic; color: #5a5040; font-size: 16px; letter-spacing: 3px; }
+.basit-btn {
+  font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 3px;
+  text-transform: uppercase; padding: 16px 40px; cursor: pointer;
+  border-radius: 2px; transition: all 0.3s ease; display: block; width: 280px;
+}
+.basit-btn.ana {
+  background: rgba(180,150,60,0.1); border: 1px solid rgba(180,150,60,0.5); color: #c9a84c;
+}
+.basit-btn.ana:hover { background: rgba(180,150,60,0.2); box-shadow: 0 0 20px rgba(180,150,60,0.2); }
+.basit-btn.ikincil {
+  background: transparent; border: 1px solid rgba(180,150,60,0.2); color: #5a5040;
+}
+.basit-btn.ikincil:hover { border-color: rgba(180,150,60,0.4); color: #8a8060; }
+#kayit-bilgi { font-size: 13px; color: #3a3028; font-family: 'Cinzel', serif; }
+
+/* ── KARAKTER OLUŞTURMA ── */
+#karakter-ekran {
+  max-width: 600px; margin: 0 auto; padding: 40px 20px;
+}
+#karakter-ekran h2 {
+  font-family: 'Cinzel', serif; color: #c9a84c; letter-spacing: 4px;
+  text-align: center; margin-bottom: 8px; font-size: 20px;
+}
+.karakter-bolum { margin-bottom: 28px; }
+.karakter-bolum label {
   font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px;
-  color: #5a5040; text-transform: uppercase; margin-bottom: 10px;
-  display: flex; align-items: center; gap: 8px;
+  color: #5a5040; text-transform: uppercase; display: block; margin-bottom: 10px;
 }
-#harita-baslik::after { content:''; flex:1; height:1px; background:rgba(180,150,60,0.1); }
-#harita-odalar {
-  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+#isim-input {
+  width: 100%; background: rgba(10,8,5,0.9); border: 1px solid rgba(180,150,60,0.3);
+  color: #d4c9a8; font-family: 'Crimson Text', serif; font-size: 18px;
+  padding: 12px 16px; border-radius: 2px; outline: none;
+  transition: border-color 0.2s;
 }
+#isim-input:focus { border-color: rgba(180,150,60,0.7); }
+/* Sınıf kartları */
+.sinif-kartlar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.sinif-kart {
+  background: rgba(10,8,5,0.9); border: 1px solid rgba(180,150,60,0.15);
+  border-radius: 3px; padding: 18px 12px; text-align: center; cursor: pointer;
+  transition: all 0.25s ease;
+}
+.sinif-kart:hover { border-color: rgba(180,150,60,0.4); background: rgba(180,150,60,0.05); }
+.sinif-kart.secili {
+  border-color: #c9a84c; background: rgba(180,150,60,0.1);
+  box-shadow: 0 0 16px rgba(180,150,60,0.15);
+}
+.sinif-emoji { font-size: 32px; margin-bottom: 8px; }
+.sinif-isim { font-family: 'Cinzel', serif; font-size: 13px; color: #c9a84c; letter-spacing: 1px; margin-bottom: 6px; }
+.sinif-aciklama { font-size: 13px; color: #5a5040; line-height: 1.5; }
+.sinif-statlar { margin-top: 8px; font-size: 12px; color: #7a6e5a; font-family: 'Cinzel', serif; }
+
+/* ── BAŞARIM BİLDİRİMİ ── */
+#basarim-bildirim {
+  position: fixed; bottom: 24px; right: 24px;
+  background: rgba(15,12,5,0.97); border: 1px solid rgba(220,180,60,0.5);
+  border-radius: 4px; padding: 14px 18px; max-width: 280px;
+  opacity: 0; transform: translateY(16px);
+  transition: all 0.4s ease; z-index: 300; pointer-events: none;
+}
+#basarim-bildirim.gorun { opacity: 1; transform: translateY(0); }
+#basarim-bildirim .b-baslik { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; color: #c9a84c; margin-bottom: 4px; }
+#basarim-bildirim .b-metin { font-size: 14px; color: #d4c9a8; }
+
+/* ── SKOR & BAŞARIM EKRANI ── */
+#basarim-ekran { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+#basarim-ekran h2 { font-family: 'Cinzel', serif; color: #c9a84c; letter-spacing: 4px; text-align: center; margin-bottom: 24px; }
+.basarim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+.basarim-item {
+  background: rgba(10,8,5,0.9); border: 1px solid rgba(180,150,60,0.1);
+  border-radius: 3px; padding: 14px; display: flex; align-items: center; gap: 12px;
+  transition: all 0.3s;
+}
+.basarim-item.kazanildi { border-color: rgba(180,150,60,0.4); background: rgba(180,150,60,0.06); }
+.basarim-item.kazanildi .b-icon { filter: none; }
+.b-icon { font-size: 24px; filter: grayscale(1) opacity(0.3); transition: filter 0.3s; }
+.b-bilgi { flex: 1; }
+.b-ad { font-family: 'Cinzel', serif; font-size: 12px; color: #7a6e5a; letter-spacing: 1px; }
+.basarim-item.kazanildi .b-ad { color: #c9a84c; }
+.b-tanim { font-size: 13px; color: #3a3028; line-height: 1.4; }
+.basarim-item.kazanildi .b-tanim { color: #7a7060; }
+.skor-kutu {
+  background: rgba(10,8,5,0.9); border: 1px solid rgba(180,150,60,0.2);
+  border-radius: 3px; padding: 20px; text-align: center; margin-bottom: 20px;
+}
+.skor-sayi { font-family: 'Cinzel', serif; font-size: 48px; color: #c9a84c; }
+.skor-label { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; color: #5a5040; }
+
+/* ── HARITA ── */
+#harita-wrap {
+  margin-bottom: 16px; background: rgba(10,8,5,0.9);
+  border: 1px solid rgba(180,150,60,0.12); border-radius: 4px; padding: 12px 16px;
+}
+#harita-baslik { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; color: #3a3028; text-transform: uppercase; margin-bottom: 8px; }
+#harita-odalar { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
 .harita-oda {
   font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
-  padding: 5px 10px; border-radius: 2px;
-  border: 1px solid rgba(180,150,60,0.15);
-  color: #5a5040; background: transparent;
-  transition: all 0.3s ease; white-space: nowrap;
-  position: relative;
+  padding: 4px 9px; border-radius: 2px; border: 1px solid rgba(180,150,60,0.1);
+  color: #3a3028; white-space: nowrap; transition: all 0.3s;
 }
-.harita-oda.kesfedildi { color: #7a6e5a; border-color: rgba(180,150,60,0.25); }
-.harita-oda.aktif {
-  color: #c9a84c; border-color: rgba(180,150,60,0.7);
-  background: rgba(180,150,60,0.08);
-  box-shadow: 0 0 12px rgba(180,150,60,0.15);
-}
-.harita-ok { color: #3a3028; font-size: 12px; }
+.harita-oda.kesfedildi { color: #6a6050; border-color: rgba(180,150,60,0.2); }
+.harita-oda.aktif { color: #c9a84c; border-color: rgba(180,150,60,0.6); background: rgba(180,150,60,0.08); }
+.harita-ok { color: #2a2018; font-size: 11px; }
+.bolum-rozet { font-family: 'Cinzel', serif; font-size: 10px; padding: 2px 7px; color: #c9a84c; border: 1px solid rgba(180,150,60,0.25); border-radius: 2px; margin-right: 4px; }
 
-/* Bolum rozeti */
-.bolum-rozet {
-  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
-  padding: 3px 8px; border-radius: 2px; margin-right: 4px;
-  color: #c9a84c; border: 1px solid rgba(180,150,60,0.3);
-  background: rgba(180,150,60,0.05);
-}
-
-/* ══════════════════════════════════════
-   DURUM ÇUBUĞU
-══════════════════════════════════════ */
+/* ── DURUM ÇUBUĞU ── */
 #durum-cubugu {
-  display: flex; gap: 0; flex-wrap: wrap;
-  margin-bottom: 20px;
-  font-size: 12px; color: #5a5040;
-  letter-spacing: 1px; font-family: 'Cinzel', serif;
-  background: rgba(10,8,5,0.9);
-  border: 1px solid rgba(180,150,60,0.12);
-  border-radius: 4px; overflow: hidden;
+  display: flex; flex-wrap: wrap; margin-bottom: 16px;
+  font-size: 11px; color: #5a5040; letter-spacing: 1px; font-family: 'Cinzel', serif;
+  background: rgba(10,8,5,0.9); border: 1px solid rgba(180,150,60,0.1); border-radius: 4px; overflow: hidden;
 }
-.durum-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 16px;
-  border-right: 1px solid rgba(180,150,60,0.08);
-  flex-shrink: 0;
-}
+.durum-item { display: flex; align-items: center; gap: 6px; padding: 9px 14px; border-right: 1px solid rgba(180,150,60,0.07); flex-shrink: 0; }
 .durum-item:last-child { border-right: none; flex: 1; }
-.durum-label { color: #3a3028; font-size: 10px; }
+.durum-label { color: #2a2018; font-size: 9px; }
 .durum-deger { color: #c9a84c; }
-#can-bar-bg { width: 70px; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
-#can-bar { height: 100%; border-radius: 3px; transition: width 0.5s ease, background 0.5s ease; }
+#can-bar-bg { width: 60px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+#can-bar { height: 100%; border-radius: 3px; transition: width 0.5s, background 0.5s; }
 
-/* ══════════════════════════════════════
-   SAHNE GÖRSELİ (ASCII ART ALANI)
-══════════════════════════════════════ */
+/* ── SAHNE GÖRSELİ ── */
 #sahne-gorseli {
-  width: 100%; margin-bottom: 0;
-  background: rgba(8,6,3,0.95);
-  border: 1px solid rgba(180,150,60,0.15);
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
-  padding: 28px 20px 20px;
-  text-align: center;
-  min-height: 140px;
+  width: 100%; background: rgba(8,6,3,0.97);
+  border: 1px solid rgba(180,150,60,0.12); border-bottom: none;
+  border-radius: 4px 4px 0 0; padding: 24px 20px 18px;
+  text-align: center; min-height: 120px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
+  position: relative; overflow: hidden; transition: background 0.5s;
 }
-/* Sahne görseli arka plan parıltısı */
-#sahne-gorseli::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 100%, rgba(180,130,40,0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-#sahne-ascii {
-  font-size: clamp(48px, 8vw, 72px);
-  line-height: 1; margin-bottom: 8px;
-  filter: drop-shadow(0 0 20px rgba(180,130,40,0.5));
-  transition: all 0.5s ease;
-}
-#sahne-lokasyon {
-  font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 3px;
-  color: #5a5040; text-transform: uppercase;
-}
-/* Atmosfer rengi (sahneye göre değişir) */
-#sahne-gorseli.atmosfer-karanlık { background: rgba(5,3,3,0.98); }
-#sahne-gorseli.atmosfer-savas { background: rgba(15,5,5,0.98); }
-#sahne-gorseli.atmosfer-umut { background: rgba(5,8,5,0.98); }
-#sahne-gorseli.atmosfer-gizemli { background: rgba(5,5,12,0.98); }
+#sahne-gorseli::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 100%, rgba(180,130,40,0.05) 0%, transparent 70%); pointer-events:none; }
+#sahne-ascii { font-size: clamp(44px,7vw,68px); line-height:1; margin-bottom:6px; filter:drop-shadow(0 0 16px rgba(180,130,40,0.4)); transition: all 0.4s; }
+#sahne-lokasyon { font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; color:#4a4030; text-transform:uppercase; }
+#sinif-rozet { font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px; margin-top:6px; opacity:0.6; }
+.atmosfer-karanlık { background: rgba(5,3,3,0.99) !important; }
+.atmosfer-savas { background: rgba(12,4,4,0.99) !important; }
+.atmosfer-umut { background: rgba(4,7,4,0.99) !important; }
+.atmosfer-gizemli { background: rgba(4,4,10,0.99) !important; }
 
-/* ══════════════════════════════════════
-   METİN KUTUSU
-══════════════════════════════════════ */
+/* ── METİN KUTUSU ── */
 #metin-kutusu {
-  background: rgba(12,10,6,0.95);
-  border: 1px solid rgba(180,150,60,0.2);
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  padding: 28px 36px;
-  margin-bottom: 20px; min-height: 120px; position: relative;
+  background: rgba(10,8,5,0.97); border: 1px solid rgba(180,150,60,0.18); border-top: none;
+  border-radius: 0 0 4px 4px; padding: 24px 32px; margin-bottom: 16px; min-height: 100px; position: relative;
 }
-#metin-kutusu::after {
-  content: ''; position: absolute; bottom: 8px; right: 8px;
-  width: 16px; height: 16px;
-  border-right: 1px solid rgba(180,150,60,0.3);
-  border-bottom: 1px solid rgba(180,150,60,0.3);
-}
-/* typewriter efekti için — her p görünür ama yazı teker teker çıkar */
-#metin-kutusu p { margin-bottom: 12px; min-height: 1.8em; }
-.vurgu  { color: #c9a84c; font-style: italic; }
-.cesur  { color: #e8d9b0; font-weight: 600; }
-.kirmizi{ color: #e05555; font-weight: 600; }
-.yesil  { color: #6abf69; font-weight: 600; }
-.mavi   { color: #5096dc; font-weight: 600; }
-
-/* Typewriter imleci */
-.kursor::after {
-  content: '▋'; color: #c9a84c; animation: kirp 0.8s step-end infinite;
-}
+#metin-kutusu::after { content:''; position:absolute; bottom:8px; right:8px; width:14px; height:14px; border-right:1px solid rgba(180,150,60,0.25); border-bottom:1px solid rgba(180,150,60,0.25); }
+#metin-kutusu p { margin-bottom: 10px; min-height: 1.8em; }
+.vurgu{color:#c9a84c;font-style:italic} .cesur{color:#e8d9b0;font-weight:600}
+.kirmizi{color:#e05555;font-weight:600} .yesil{color:#6abf69;font-weight:600} .mavi{color:#5096dc;font-weight:600}
+.mor{color:#b080e0;font-weight:600}
+.kursor::after { content:'▋'; color:#c9a84c; animation:kirp 0.8s step-end infinite; }
 @keyframes kirp { 0%,100%{opacity:1} 50%{opacity:0} }
 
-/* ══════════════════════════════════════
-   SEÇENEKLER
-══════════════════════════════════════ */
-#secenekler { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-.secenek-btn {
-  background: rgba(10,8,5,0.8);
-  border: 1px solid rgba(180,150,60,0.2);
-  color: #a09070; font-family: 'Crimson Text', serif; font-size: 16px;
-  padding: 13px 22px; text-align: left; cursor: pointer;
-  border-radius: 2px; transition: all 0.2s ease;
-  position: relative; opacity: 0; animation: goster 0.4s ease forwards;
-  letter-spacing: 0.3px;
+/* ── NPC DİYALOG ── */
+#diyalog-kutu {
+  display:none; margin-bottom:16px;
+  border:1px solid rgba(100,180,100,0.18); border-radius:4px; overflow:hidden;
+  background:rgba(4,10,4,0.97);
 }
-.secenek-btn span.ok { color: #5a5040; margin-right: 12px; transition: all 0.2s; display: inline-block; }
-.secenek-btn:hover { background: rgba(180,150,60,0.07); border-color: rgba(180,150,60,0.5); color: #d4c9a8; }
-.secenek-btn:hover span.ok { color: #c9a84c; transform: translateX(4px); }
-.secenek-btn:active { transform: scale(0.995); }
-.secenek-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.secenek-btn.saldir   { border-color: rgba(220,80,80,0.25); }
-.secenek-btn.saldir:hover { background: rgba(220,80,80,0.08); border-color: rgba(220,80,80,0.6); }
-.secenek-btn.savun    { border-color: rgba(80,150,220,0.25); }
-.secenek-btn.savun:hover { background: rgba(80,150,220,0.08); border-color: rgba(80,150,220,0.6); }
-.secenek-btn.strateji { border-color: rgba(180,150,60,0.35); }
-.secenek-btn.strateji:hover { background: rgba(180,150,60,0.1); }
-
-/* Büyü butonları */
-.secenek-btn.buyu { border-color: rgba(150,80,220,0.3); }
-.secenek-btn.buyu:hover { background: rgba(150,80,220,0.08); border-color: rgba(150,80,220,0.6); color: #c9a8e8; }
-
-/* ══════════════════════════════════════
-   SAVAŞ ALANI
-══════════════════════════════════════ */
-#savas-alani {
-  display: none;
-  margin-bottom: 20px;
-  border: 1px solid rgba(220,80,80,0.2);
-  border-radius: 4px; overflow: hidden;
-  background: rgba(15,5,5,0.95);
+#diyalog-baslik {
+  padding:8px 14px; background:rgba(100,180,100,0.07);
+  border-bottom:1px solid rgba(100,180,100,0.1);
+  font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:#4a7050;
+  display:flex; align-items:center; gap:10px;
 }
-#savas-baslik {
-  background: rgba(220,80,80,0.1);
-  padding: 8px 20px; font-family:'Cinzel',serif;
-  font-size: 11px; letter-spacing: 3px; color: #c04040;
-  text-align: center; text-transform: uppercase;
-  border-bottom: 1px solid rgba(220,80,80,0.15);
+#diyalog-avatar { font-size:18px; }
+#diyalog-npc-isim { color:#70a870; }
+#diyalog-gecmis {
+  max-height:160px; overflow-y:auto; padding:10px 16px;
+  display:flex; flex-direction:column; gap:6px;
 }
-#savas-icerik { display: flex; }
+.diyalog-satir { display:flex; gap:10px; align-items:flex-start; }
+.diyalog-satir.npc { }
+.diyalog-satir.oyuncu { flex-direction: row-reverse; }
+.diyalog-balon {
+  max-width:80%; padding:8px 12px; border-radius:3px; font-size:15px; line-height:1.6;
+}
+.diyalog-satir.npc .diyalog-balon { background:rgba(100,180,100,0.08); color:#90b890; border:1px solid rgba(100,180,100,0.12); font-style:italic; }
+.diyalog-satir.oyuncu .diyalog-balon { background:rgba(180,150,60,0.08); color:#b0a070; border:1px solid rgba(180,150,60,0.15); }
+#diyalog-secenekler { padding:10px 14px; border-top:1px solid rgba(100,180,100,0.08); display:flex; flex-direction:column; gap:6px; }
+.diyalog-btn {
+  background:transparent; border:1px solid rgba(100,180,100,0.15); color:#6a9070;
+  font-family:'Crimson Text',serif; font-size:15px; padding:8px 14px;
+  text-align:left; cursor:pointer; border-radius:2px; transition:all 0.2s;
+}
+.diyalog-btn:hover { background:rgba(100,180,100,0.08); border-color:rgba(100,180,100,0.4); color:#90b890; }
+.diyalog-btn::before { content:'"'; color:#507050; margin-right:4px; }
+.diyalog-btn::after { content:'"'; color:#507050; }
 
-/* Düşman kartı */
-#dusman-kart {
-  width: 220px; flex-shrink: 0;
-  padding: 18px; border-right: 1px solid rgba(220,80,80,0.15);
-}
-#dusman-ascii-savas {
-  font-size: 44px; text-align: center; margin-bottom: 10px;
-  filter: drop-shadow(0 0 12px rgba(220,80,80,0.4));
-}
-/* Düşman sağlık animasyonu (vurulunca) */
-@keyframes vurul { 0%,100%{filter:drop-shadow(0 0 12px rgba(220,80,80,0.4))} 50%{filter:drop-shadow(0 0 24px rgba(255,50,50,0.9)) brightness(1.5)} }
-.dusman-vurulan { animation: vurul 0.3s ease; }
-
-#dusman-isim { font-family:'Cinzel',serif; font-size:13px; color:#e05555; margin-bottom:6px; letter-spacing:1px; }
-.dusman-can-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-#dusman-can-bg { flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
-#dusman-can-bar { height:100%; background:linear-gradient(90deg, #6b0000, #e05555); border-radius:3px; transition:width 0.5s ease; }
-#dusman-can-sayi-wrap { font-family:'Cinzel',serif; font-size:11px; color:#7a4040; white-space:nowrap; }
-#dusman-zayiflik { font-size:12px; color:#5a4040; font-style:italic; line-height:1.5; margin-top:4px; }
-
-/* Büyü gücü göstergesi */
-#buyu-guc-wrap { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(180,150,60,0.1); }
-#buyu-guc-baslik { font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px; color:#5a4070; margin-bottom:4px; }
-#buyu-guc-bar-bg { height:5px; background:rgba(255,255,255,0.05); border-radius:3px; overflow:hidden; }
-#buyu-guc-bar { height:100%; background:linear-gradient(90deg, #3a1060, #9050d0); border-radius:3px; transition:width 0.4s ease; width:0%; }
-
-/* Savaş log */
-#oyuncu-savas { flex:1; padding:18px; display:flex; flex-direction:column; }
-#oyuncu-savas-baslik { font-family:'Cinzel',serif; font-size:10px; color:#5a5040; margin-bottom:8px; letter-spacing:2px; text-transform:uppercase; }
-#savas-log { flex:1; font-size:14px; line-height:1.7; color:#6a6050; max-height:160px; overflow-y:auto; padding-right:4px; }
-#savas-log p { margin-bottom:2px; opacity:0; animation:goster 0.3s ease forwards; }
-.log-hasar   { color:#c05050; }
-.log-savun   { color:#4080b0; }
-.log-strateji{ color:#b09040; }
-.log-buyu    { color:#9050c0; }
-.log-sistem  { color:#5a5040; font-style:italic; }
-.log-zafer   { color:#70a060; font-weight:600; }
-.log-hasar-al{ color:#e06060; }
-
-/* Tur sayacı */
-#tur-sayac { font-family:'Cinzel',serif; font-size:10px; color:#3a3028; margin-top:8px; letter-spacing:1px; text-align:right; }
-
-/* ══════════════════════════════════════
-   NPC KONUŞMA KUTUSU
-══════════════════════════════════════ */
-#npc-kutu {
-  display: none;
-  margin-bottom: 16px;
-  border: 1px solid rgba(100,180,100,0.2);
-  border-radius: 4px; overflow: hidden;
-  background: rgba(5,12,5,0.95);
-}
-#npc-baslik {
-  padding: 8px 16px;
-  background: rgba(100,180,100,0.08);
-  border-bottom: 1px solid rgba(100,180,100,0.1);
-  font-family: 'Cinzel',serif; font-size:11px; letter-spacing:2px;
-  color: #507050; display: flex; align-items: center; gap: 10px;
-}
-#npc-avatar { font-size:20px; }
-#npc-isim-yazi { color: #70a070; }
-#npc-metin { padding: 14px 18px; font-size:16px; color:#90b090; font-style:italic; line-height:1.7; }
-
-/* ══════════════════════════════════════
-   YAN GÖREV PANELI
-══════════════════════════════════════ */
-#gorev-panel {
-  margin-bottom: 20px;
-  background: rgba(8,6,3,0.9);
-  border: 1px solid rgba(180,150,60,0.1);
-  border-radius: 4px; overflow: hidden;
-}
-#gorev-baslik {
-  padding: 8px 16px;
-  border-bottom: 1px solid rgba(180,150,60,0.08);
-  font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px;
-  color:#5a5040; text-transform:uppercase;
-  display:flex; align-items:center; justify-content:space-between;
-  cursor:pointer; user-select:none;
-}
-#gorev-baslik:hover { color:#8a8060; }
-#gorev-icerik { padding: 10px 16px; }
-.gorev-satir {
-  display:flex; align-items:flex-start; gap:10px;
-  padding: 6px 0; border-bottom: 1px solid rgba(180,150,60,0.06);
-  font-size:14px;
-}
+/* ── YAN GÖREV ── */
+#gorev-panel { margin-bottom:16px; background:rgba(8,6,3,0.9); border:1px solid rgba(180,150,60,0.1); border-radius:4px; overflow:hidden; }
+#gorev-baslik { padding:8px 14px; border-bottom:1px solid rgba(180,150,60,0.06); font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:#4a4030; text-transform:uppercase; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+#gorev-baslik:hover { color:#7a7050; }
+#gorev-icerik { padding:8px 14px; }
+.gorev-satir { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid rgba(180,150,60,0.05); font-size:14px; }
 .gorev-satir:last-child { border-bottom:none; }
-.gorev-durum { font-size:12px; flex-shrink:0; margin-top:2px; }
-.gorev-metin { color:#7a7060; line-height:1.5; }
-.gorev-metin.tamamlandi { color:#507050; text-decoration:line-through; opacity:0.6; }
-.gorev-puan { font-family:'Cinzel',serif; font-size:10px; color:#5a5040; flex-shrink:0; margin-left:auto; }
+.gorev-durum { font-size:11px; flex-shrink:0; margin-top:3px; }
+.gorev-metin { color:#6a6050; line-height:1.5; }
+.gorev-metin.tamamlandi { color:#4a6040; text-decoration:line-through; opacity:0.6; }
+.gorev-puan { font-family:'Cinzel',serif; font-size:9px; color:#4a4030; flex-shrink:0; margin-left:auto; }
 
-/* ══════════════════════════════════════
-   GEÇİŞ PERDESİ
-══════════════════════════════════════ */
-#gecis-perdesi {
-  position:fixed; inset:0; background:#080810;
-  pointer-events:none; opacity:0;
-  transition:opacity 0.5s ease; z-index:100;
+/* ── SEÇENEKLER ── */
+#secenekler { display:flex; flex-direction:column; gap:7px; margin-bottom:20px; }
+.secenek-btn {
+  background:rgba(10,8,5,0.8); border:1px solid rgba(180,150,60,0.18);
+  color:#8a8060; font-family:'Crimson Text',serif; font-size:16px;
+  padding:12px 20px; text-align:left; cursor:pointer; border-radius:2px;
+  transition:all 0.2s; position:relative; opacity:0; animation:goster 0.4s ease forwards;
 }
+.secenek-btn .ok { color:#4a4030; margin-right:10px; transition:all 0.2s; display:inline-block; }
+.secenek-btn:hover { background:rgba(180,150,60,0.07); border-color:rgba(180,150,60,0.45); color:#d4c9a8; }
+.secenek-btn:hover .ok { color:#c9a84c; transform:translateX(4px); }
+.secenek-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.secenek-btn.saldir   { border-color:rgba(220,80,80,0.22); }
+.secenek-btn.saldir:hover   { background:rgba(220,80,80,0.07); border-color:rgba(220,80,80,0.55); }
+.secenek-btn.savun    { border-color:rgba(80,150,220,0.22); }
+.secenek-btn.savun:hover    { background:rgba(80,150,220,0.07); border-color:rgba(80,150,220,0.55); }
+.secenek-btn.strateji { border-color:rgba(180,150,60,0.3); }
+.secenek-btn.buyu     { border-color:rgba(150,80,220,0.25); }
+.secenek-btn.buyu:hover { background:rgba(150,80,220,0.07); border-color:rgba(150,80,220,0.55); }
 
-/* Bildirim (ekranın üstünde çıkan küçük mesaj) */
-#bildirim {
-  position:fixed; top:20px; left:50%; transform:translateX(-50%);
-  background:rgba(20,15,8,0.95); border:1px solid rgba(180,150,60,0.4);
-  border-radius:3px; padding:10px 20px;
-  font-family:'Cinzel',serif; font-size:12px; letter-spacing:1px; color:#c9a84c;
-  opacity:0; transition:opacity 0.3s ease; z-index:200;
-  pointer-events:none; white-space:nowrap;
-}
+/* ── SAVAŞ ── */
+#savas-alani { display:none; margin-bottom:16px; border:1px solid rgba(220,80,80,0.18); border-radius:4px; overflow:hidden; background:rgba(12,4,4,0.97); }
+#savas-baslik { background:rgba(220,80,80,0.08); padding:7px 18px; font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; color:#903030; text-align:center; border-bottom:1px solid rgba(220,80,80,0.12); }
+#savas-icerik { display:flex; }
+#dusman-kart { width:200px; flex-shrink:0; padding:16px; border-right:1px solid rgba(220,80,80,0.12); }
+#dusman-ascii-savas { font-size:40px; text-align:center; margin-bottom:8px; filter:drop-shadow(0 0 10px rgba(220,80,80,0.3)); }
+@keyframes vurul { 0%,100%{filter:drop-shadow(0 0 10px rgba(220,80,80,0.3))} 50%{filter:drop-shadow(0 0 28px rgba(255,50,50,1)) brightness(1.8)} }
+.dusman-vurulan { animation:vurul 0.3s ease; }
+#dusman-isim { font-family:'Cinzel',serif; font-size:12px; color:#c04040; margin-bottom:6px; }
+.dc-row { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+#dusman-can-bg { flex:1; height:5px; background:rgba(255,255,255,0.05); border-radius:3px; overflow:hidden; }
+#dusman-can-bar { height:100%; background:linear-gradient(90deg,#5a0000,#d04040); border-radius:3px; transition:width 0.5s; }
+#dusman-can-sayi-wrap { font-family:'Cinzel',serif; font-size:10px; color:#7a3030; white-space:nowrap; }
+#dusman-zayiflik { font-size:12px; color:#4a3030; font-style:italic; line-height:1.5; }
+#buyu-guc-wrap { margin-top:8px; padding-top:8px; border-top:1px solid rgba(180,150,60,0.08); }
+#buyu-guc-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; color:#4a3060; margin-bottom:3px; }
+#buyu-guc-bg { height:4px; background:rgba(255,255,255,0.04); border-radius:3px; overflow:hidden; }
+#buyu-guc-bar { height:100%; background:linear-gradient(90deg,#3a0860,#8040c0); border-radius:3px; transition:width 0.4s; width:0%; }
+#oyuncu-savas { flex:1; padding:16px; display:flex; flex-direction:column; }
+#oyuncu-savas-baslik { font-family:'Cinzel',serif; font-size:9px; color:#4a4030; margin-bottom:6px; letter-spacing:2px; text-transform:uppercase; }
+#savas-log { flex:1; font-size:13px; line-height:1.7; color:#5a5040; max-height:140px; overflow-y:auto; }
+#savas-log p { margin-bottom:1px; opacity:0; animation:goster 0.3s ease forwards; }
+.log-hasar{color:#b04040} .log-savun{color:#3070a0} .log-strateji{color:#a09030} .log-buyu{color:#8040b0} .log-sistem{color:#4a4030;font-style:italic} .log-zafer{color:#508040;font-weight:600} .log-hasar-al{color:#c05050}
+#tur-sayac { font-family:'Cinzel',serif; font-size:9px; color:#2a2018; margin-top:6px; text-align:right; }
 
-/* ══════════════════════════════════════
-   ANİMASYONLAR
-══════════════════════════════════════ */
+/* ── SES KONTROL ── */
+#ses-panel { position:fixed; top:16px; right:16px; display:flex; gap:8px; z-index:200; }
+.ses-btn { background:rgba(10,8,5,0.9); border:1px solid rgba(180,150,60,0.2); color:#5a5040; font-size:16px; width:36px; height:36px; border-radius:50%; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; }
+.ses-btn:hover { border-color:rgba(180,150,60,0.5); color:#c9a84c; }
+.ses-btn.aktif { color:#c9a84c; border-color:rgba(180,150,60,0.5); }
+
+/* ── GEÇİŞ & BİLDİRİMLER ── */
+#gecis-perdesi { position:fixed; inset:0; background:#080810; pointer-events:none; opacity:0; transition:opacity 0.5s; z-index:100; }
+#bildirim { position:fixed; top:16px; left:50%; transform:translateX(-50%); background:rgba(15,12,5,0.97); border:1px solid rgba(180,150,60,0.35); border-radius:2px; padding:9px 18px; font-family:'Cinzel',serif; font-size:11px; letter-spacing:1px; color:#c9a84c; opacity:0; transition:opacity 0.3s; z-index:200; pointer-events:none; white-space:nowrap; }
+
+/* ── ANİMASYONLAR ── */
 @keyframes yuksel  { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-@keyframes goster  { from{opacity:0;transform:translateY(6px)}  to{opacity:1;transform:translateY(0)} }
-@keyframes sarsil  { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 60%{transform:translateX(6px)} }
-@keyframes parlat  { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 30px rgba(180,130,40,0.3)} }
-@keyframes buyuEfekt {
-  0%   { text-shadow: 0 0 0px rgba(150,80,220,0); }
-  50%  { text-shadow: 0 0 30px rgba(150,80,220,0.8), 0 0 60px rgba(100,50,180,0.4); }
-  100% { text-shadow: 0 0 0px rgba(150,80,220,0); }
-}
-.sarsil { animation: sarsil 0.35s ease; }
-.parlat { animation: parlat 0.6s ease; }
+@keyframes goster  { from{opacity:0;transform:translateY(5px)}  to{opacity:1;transform:translateY(0)} }
+@keyframes sarsil  { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 60%{transform:translateX(5px)} }
+@keyframes buyuEfekt { 0%,100%{text-shadow:none} 50%{text-shadow:0 0 30px rgba(150,80,220,0.9), 0 0 60px rgba(100,50,180,0.5)} }
+.sarsil { animation:sarsil 0.35s ease; }
 
-/* ══════════════════════════════════════
-   MOBİL
-══════════════════════════════════════ */
-@media (max-width:600px) {
-  #metin-kutusu { padding:20px 18px; }
-  #savas-icerik { flex-direction:column; }
-  #dusman-kart { width:100%; border-right:none; border-bottom:1px solid rgba(220,80,80,0.15); }
-  .durum-item { padding:8px 12px; }
+@media(max-width:600px) {
+  #metin-kutusu{padding:18px 16px} #savas-icerik{flex-direction:column}
+  #dusman-kart{width:100%;border-right:none;border-bottom:1px solid rgba(220,80,80,0.12)}
+  .sinif-kartlar{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 <div id="gecis-perdesi"></div>
 <div id="bildirim"></div>
+<div id="basarim-bildirim"><div class="b-baslik">🏆 BAŞARIM KAZANILDI</div><div class="b-metin" id="basarim-metin"></div></div>
+
+<!-- SES BUTONLARI -->
+<div id="ses-panel">
+  <button class="ses-btn" id="muzik-btn" onclick="muzikToggle()" title="Müzik">🎵</button>
+  <button class="ses-btn aktif" id="ses-btn" onclick="sesToggle()" title="Ses efektleri">🔊</button>
+</div>
 
 <div id="oyun-kutusu">
 
-  <!-- BAŞLIK -->
-  <div id="baslik">
-    <div class="alt-baslik">Bir Metin Macerası</div>
-    <div class="ayirici"></div>
-    <h1>Unutulmuş Kule</h1>
-    <div class="ayirici"></div>
+<!-- ══ BAŞLANGIÇ EKRANI ══ -->
+<div id="ekran-basit" class="ekran aktif">
+  <div id="basit-ekran">
+    <div>
+      <div style="font-style:italic;color:#3a3028;font-size:14px;letter-spacing:3px;margin-bottom:12px">Bir Metin Macerası</div>
+      <div style="width:120px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c55,#c9a84c,#c9a84c55,transparent);margin:0 auto 12px"></div>
+      <h1>Unutulmuş Kule</h1>
+      <div style="width:120px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c55,#c9a84c,#c9a84c55,transparent);margin:12px auto 0"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+      <button class="basit-btn ana" onclick="yeniOyunBaslat()">Yeni Oyun</button>
+      <button class="basit-btn ikincil" id="devam-btn" onclick="kayittenDevam()" style="display:none">Kaldığın Yerden Devam</button>
+      <button class="basit-btn ikincil" onclick="basarimEkraniAc()">🏆 Başarımlar & Skor</button>
+    </div>
+    <div id="kayit-bilgi"></div>
   </div>
+</div>
 
-  <!-- HARITA -->
+<!-- ══ KARAKTER OLUŞTURMA EKRANI ══ -->
+<div id="ekran-karakter" class="ekran">
+  <div id="karakter-ekran">
+    <h2>Kahramanını Oluştur</h2>
+    <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:10px auto 28px"></div>
+    <div class="karakter-bolum">
+      <label>Kahramanın adı</label>
+      <input type="text" id="isim-input" placeholder="Adını gir..." maxlength="20" value="Kael">
+    </div>
+    <div class="karakter-bolum">
+      <label>Sınıfını seç</label>
+      <div class="sinif-kartlar">
+        <div class="sinif-kart secili" onclick="sinifSec('savasci',this)">
+          <div class="sinif-emoji">⚔️</div>
+          <div class="sinif-isim">Savaşçı</div>
+          <div class="sinif-aciklama">Güçlü darbeler, yüksek can</div>
+          <div class="sinif-statlar">CAN +20 · SALDIRI +5</div>
+        </div>
+        <div class="sinif-kart" onclick="sinifSec('buyucu',this)">
+          <div class="sinif-emoji">🔮</div>
+          <div class="sinif-isim">Büyücü</div>
+          <div class="sinif-aciklama">Güçlü büyüler, 3 güçle büyü</div>
+          <div class="sinif-statlar">BÜYÜ ×3 · BÜYÜ EŞIĞI -2</div>
+        </div>
+        <div class="sinif-kart" onclick="sinifSec('hirsiz',this)">
+          <div class="sinif-emoji">🗡️</div>
+          <div class="sinif-isim">Hırsız</div>
+          <div class="sinif-aciklama">Çabuk saldırı, çift hamle şansı</div>
+          <div class="sinif-statlar">ÇIFT HAMLE %30 · SAVUNMA +3</div>
+        </div>
+      </div>
+    </div>
+    <button class="basit-btn ana" style="margin:0 auto" onclick="karakterOlustur()">Maceraya Başla</button>
+  </div>
+</div>
+
+<!-- ══ BAŞARIM EKRANI ══ -->
+<div id="ekran-basarim" class="ekran">
+  <div id="basarim-ekran">
+    <h2>Başarımlar & Skor</h2>
+    <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:10px auto 24px"></div>
+    <div class="skor-kutu">
+      <div class="skor-label">EN YÜKSEK SKOR</div>
+      <div class="skor-sayi" id="en-yuksek-skor">0</div>
+      <div class="skor-label" id="son-oyun-skor" style="margin-top:8px"></div>
+    </div>
+    <div class="basarim-grid" id="basarim-grid"></div>
+    <button class="basit-btn ikincil" style="margin:0 auto" onclick="anaMenuye()">← Ana Menü</button>
+  </div>
+</div>
+
+<!-- ══ ANA OYUN EKRANI ══ -->
+<div id="ekran-oyun" class="ekran">
   <div id="harita-wrap">
     <div id="harita-baslik">🗺 Konum</div>
     <div id="harita-odalar"></div>
   </div>
-
-  <!-- YAN GÖREVLER -->
   <div id="gorev-panel">
-    <div id="gorev-baslik" onclick="gorevToggle()">
-      📜 GÖREVLER <span id="gorev-ok">▾</span>
-    </div>
+    <div id="gorev-baslik" onclick="gorevToggle()">📜 GÖREVLER <span id="gorev-ilerleme"></span><span id="gorev-ok">▾</span></div>
     <div id="gorev-icerik"></div>
   </div>
-
-  <!-- DURUM ÇUBUĞU -->
   <div id="durum-cubugu">
-    <div class="durum-item">
-      <span class="durum-label">KAHRAMAN</span>
-      <span class="durum-deger" id="d-isim">Kael</span>
-    </div>
-    <div class="durum-item">
-      <span class="durum-label">CAN</span>
-      <span class="durum-deger" id="d-can-yazi">100</span>
-      <span id="can-bar-bg"><span id="can-bar" style="width:100%;background:#6abf69"></span></span>
-    </div>
-    <div class="durum-item">
-      <span class="durum-label">CESARET</span>
-      <span class="durum-deger" id="d-cesaret">★★★☆☆</span>
-    </div>
-    <div class="durum-item">
-      <span class="durum-label">BÜYÜ</span>
-      <span class="durum-deger" id="d-buyu">✦✦✦✦✦</span>
-    </div>
-    <div class="durum-item">
-      <span class="durum-label">ENVANTER</span>
-      <span class="durum-deger" id="d-envanter">Fener, Hançer</span>
-    </div>
+    <div class="durum-item"><span class="durum-label">KAHRAMAN</span><span class="durum-deger" id="d-isim">Kael</span><span id="d-sinif-icon" style="font-size:14px">⚔️</span></div>
+    <div class="durum-item"><span class="durum-label">CAN</span><span class="durum-deger" id="d-can-yazi">100</span><span id="can-bar-bg"><span id="can-bar" style="width:100%;background:#6abf69"></span></span></div>
+    <div class="durum-item"><span class="durum-label">CESARET</span><span class="durum-deger" id="d-cesaret">★★★☆☆</span></div>
+    <div class="durum-item"><span class="durum-label">BÜYÜ</span><span class="durum-deger" id="d-buyu">✧✧✧✧✧</span></div>
+    <div class="durum-item"><span class="durum-label">PUAN</span><span class="durum-deger" id="d-puan">0</span></div>
+    <div class="durum-item"><span class="durum-label">ENVANTER</span><span class="durum-deger" id="d-envanter">Fener, Hançer</span></div>
   </div>
-
-  <!-- SAHNE GÖRSELİ -->
   <div id="sahne-gorseli">
     <div id="sahne-ascii">🏰</div>
-    <div id="sahne-lokasyon">Bilinmeyen Konum</div>
+    <div id="sahne-lokasyon">Bilinmeyen</div>
+    <div id="sinif-rozet"></div>
   </div>
-
-  <!-- NPC KONUŞMA -->
-  <div id="npc-kutu">
-    <div id="npc-baslik">
-      <span id="npc-avatar">👤</span>
-      <span id="npc-isim-yazi">???</span>
-    </div>
-    <div id="npc-metin"></div>
+  <div id="diyalog-kutu">
+    <div id="diyalog-baslik"><span id="diyalog-avatar">👤</span><span id="diyalog-npc-isim">???</span></div>
+    <div id="diyalog-gecmis"></div>
+    <div id="diyalog-secenekler"></div>
   </div>
-
-  <!-- HİKAYE METNİ -->
   <div id="metin-kutusu"></div>
-
-  <!-- SAVAŞ ALANI -->
   <div id="savas-alani">
     <div id="savas-baslik">⚔ SAVAŞ ⚔</div>
     <div id="savas-icerik">
       <div id="dusman-kart">
         <div id="dusman-ascii-savas">👹</div>
         <div id="dusman-isim">Düşman</div>
-        <div class="dusman-can-row">
+        <div class="dc-row">
           <div id="dusman-can-bg"><div id="dusman-can-bar" style="width:100%"></div></div>
           <div id="dusman-can-sayi-wrap"><span id="d-can-sayi">0</span>/<span id="d-can-max">0</span></div>
         </div>
         <div id="dusman-zayiflik"></div>
         <div id="buyu-guc-wrap">
-          <div id="buyu-guc-baslik">✦ BÜYÜ GÜCÜ</div>
-          <div id="buyu-guc-bar-bg"><div id="buyu-guc-bar"></div></div>
+          <div id="buyu-guc-label">✦ BÜYÜ GÜCÜ</div>
+          <div id="buyu-guc-bg"><div id="buyu-guc-bar"></div></div>
         </div>
       </div>
       <div id="oyuncu-savas">
@@ -463,1010 +435,1001 @@ body {
       </div>
     </div>
   </div>
-
-  <!-- SEÇENEKLER -->
   <div id="secenekler"></div>
-
+  <div style="text-align:center;margin-bottom:20px">
+    <button class="basit-btn ikincil" style="width:auto;padding:8px 20px;font-size:11px" onclick="oyunuKaydet()">💾 Kaydet</button>
+    <button class="basit-btn ikincil" style="width:auto;padding:8px 20px;font-size:11px;margin-left:8px" onclick="anaMenuye()">← Menü</button>
+  </div>
 </div>
+
+</div><!-- oyun-kutusu sonu -->
 
 <script>
 /*
-╔══════════════════════════════════════════════════════════════╗
-║  UNUTULMUŞ KULE — GELİŞMİŞ VERSİYON                        ║
-║  YENİ ÖZELLİKLER:                                           ║
-║  • Harita sistemi (hangi odadasın, neleri keşfettin)        ║
-║  • Typewriter efekti (metin teker teker çıkıyor)            ║
-║  • Her sahneye göre değişen görsel + atmosfer               ║
-║  • Büyü sistemi (savaşta 4. hamle, 5 büyü gücü lazım)      ║
-║  • NPC konuşma kutusu (ayrı tasarım, avatar ile)            ║
-║  • Yan görev sistemi (tamamlayınca puan kazanırsın)         ║
-║  • Bildirim sistemi (ekranda anlık mesaj)                   ║
-╚══════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════╗
+║  UNUTULMUŞ KULE — TAM SÜRÜM                                     ║
+║  ✦ Karakter özelleştirme (3 sınıf, farklı istatistikler)       ║
+║  ✦ Kayıt sistemi (localStorage — tarayıcıya kaydeder)          ║
+║  ✦ Başarımlar (12 başarım, ekranda gösterim)                    ║
+║  ✦ Skor tablosu (en yüksek skor kaydı)                         ║
+║  ✦ Diyalog ağacı (NPC ile gerçek konuşma, seçimler)            ║
+║  ✦ 4. Bölüm (yeni hikaye, 3 farklı son)                        ║
+║  ✦ Ses sistemi (Web Audio API, gerçek sesler)                   ╚══════════════════════════════════════════════════════════════════╝
 */
 
-// ── OYUNCU ────────────────────────────────────────────────────
-const oyuncu = {
-  isim: "Kael",
-  can: 100, maxCan: 100,
-  cesaret: 3,
-  buyuGucu: 0, maxBuyuGucu: 5,   // Büyü kullanmak için 5 birik lazım
-  envanter: ["Fener", "Hançer"],
-  kararlar: [],
-  saldiriGucu: 18,
-  savunma: 5,
-  puan: 0,
-};
-
-// ── YAN GÖREVLER ─────────────────────────────────────────────
-/*
-  Her görev:
-  - metin: görevin açıklaması
-  - kontrol: (oyuncu) => true/false — tamamlandı mı?
-  - puan: tamamlayınca kaç puan
-*/
-const gorevler = [
-  { id:"g1", metin:"Babanın kitabını bul",       kontrol: o => o.envanter.includes("Babanın Kitabı"), puan: 50  },
-  { id:"g2", metin:"Babanın notunu oku",          kontrol: o => o.kararlar.includes("notu_aldi"),      puan: 30  },
-  { id:"g3", metin:"Sırrı çözmeden kapıyı aç",   kontrol: o => o.kararlar.includes("sifre_cozdu"),    puan: 70  },
-  { id:"g4", metin:"Maron'a güven ve onu dinle",  kontrol: o => o.kararlar.includes("maron_ile_gitti"),puan: 40  },
-  { id:"g5", metin:"Birliği tanı",                kontrol: o => o.kararlar.includes("birlik_ogrendi"), puan: 60  },
-  { id:"g6", metin:"Gece Yarısı'nı savaşarak yok et", kontrol: o => o.kararlar.includes("gece_ile_savasti") && o.kararlar.includes("gece_oldu"), puan: 80 },
-  { id:"g7", metin:"Raven'ın geçmişini öğren",   kontrol: o => o.kararlar.includes("raven_anladi"),   puan: 60  },
-  { id:"g8", metin:"Tüm bölümleri tamamla",       kontrol: o => o.kararlar.includes("oyun_bitti"),     puan: 200 },
-];
-
-// ── HARITA ODA LİSTESİ ────────────────────────────────────────
-/*
-  Her oda bir konum.
-  "bolum" hangi bölümde olduğunu gösterir.
-  Harita sırayla bu odaları gösterir — aktif olan vurgulanır.
-*/
-const haritaOdalari = [
-  { id:"dis",      isim:"Kule Önü",     bolum:1 },
-  { id:"giris",    isim:"Giriş Katı",   bolum:1 },
-  { id:"bodrum",   isim:"Bodrum",       bolum:1 },
-  { id:"ust",      isim:"Üst Kat",      bolum:1 },
-  { id:"kacis",    isim:"Kaçış",        bolum:2 },
-  { id:"orman",    isim:"Orman",        bolum:2 },
-  { id:"geri",     isim:"Geri Dönüş",   bolum:3 },
-  { id:"derinlik", isim:"Derinlik",     bolum:3 },
-];
-
-// Hangi sahne hangi harita konumuna ait
-const sahneKonum = {
-  "baslangic":"dis", "ahsap_kapi":"giris", "demir_kapi":"giris",
-  "pencere_goz":"giris", "raflari_incele":"giris", "izleri_takip":"giris",
-  "sembol_incele":"giris", "demir_kapi_coz":"giris", "demir_kapi_acildi":"giris",
-  "kilit_zorla":"giris", "bodrum":"bodrum", "bodrum_incele":"bodrum",
-  "kristal_dokunma":"bodrum",
-  "ust_kat":"ust", "baba_ile_kavusma":"ust", "pelerin_incele":"ust",
-  "pencereden_gir":"giris", "kapiyi_vur":"giris", "gozle":"dis",
-  "yasli_adam_tanisma":"giris", "yasli_adam_dur":"dis",
-  "yasli_adam_takip":"dis", "baba_nerede_sor":"giris",
-  "dusman_hakkinda":"giris",
-  "b2_baslangic":"ust", "b2_formul_sor":"ust", "b2_silah_sahne":"ust",
-  "b2_savas_1":"ust", "b2_savas_1_zafer":"ust", "b2_savas_2":"ust",
-  "b2_teslim_ol":"ust", "b2_kacis_ara":"ust",
-  "b2_gizli_gecit":"kacis", "b2_kacis_koridoru":"kacis",
-  "b2_savas_gece":"kacis", "b2_fener_kac":"kacis",
-  "b2_tunel":"orman", "b2_raven_sirri":"orman",
-  "b2_kamp":"orman", "b2_kac_kac":"orman", "b2_karar":"orman",
-  "b3_giris":"geri", "b3_yaklasma":"derinlik", "b3_bagir":"derinlik",
-  "b3_neden":"derinlik", "b3_ihanet":"derinlik",
-  "b3_son_savas":"derinlik", "b3_zafer":"derinlik",
-  "b3_olum":"derinlik", "son_iyi":"derinlik", "son_kendi":"derinlik",
-};
-
-// Keşfedilen konumlar
-const kesfedilenler = new Set();
-
-// ── SAHNE GÖRSELLERİ ─────────────────────────────────────────
-/*
-  Her sahnenin:
-  - emoji: büyük görsel ikonu
-  - lokasyon: altta yazan metin
-  - atmosfer: arka plan CSS sınıfı
-  - npc: eğer NPC varsa {avatar, isim, metin}
-*/
-const sahneGorselleri = {
-  "baslangic":    { emoji:"🏰", lokasyon:"Unutulmuş Kule — Dış Avlu", atmosfer:"atmosfer-gizemli" },
-  "ahsap_kapi":   { emoji:"🚪", lokasyon:"Ahşap Kapı — Giriş Koridoru", atmosfer:"atmosfer-karanlık" },
-  "demir_kapi":   { emoji:"⛓", lokasyon:"Demir Kapı — Zincirli Geçit", atmosfer:"atmosfer-karanlık" },
-  "pencere_goz":  { emoji:"👁️", lokasyon:"Yan Pencere", atmosfer:"atmosfer-gizemli" },
-  "raflari_incele":{ emoji:"📚", lokasyon:"Kitaplık — Giriş Katı", atmosfer:"atmosfer-karanlık" },
-  "izleri_takip": { emoji:"👣", lokasyon:"Koridor — Ayak İzleri", atmosfer:"atmosfer-karanlık" },
-  "bodrum":       { emoji:"💎", lokasyon:"Bodrum — Kristal Oda", atmosfer:"atmosfer-gizemli" },
-  "kristal_dokunma":{ emoji:"✨", lokasyon:"Kristal — Büyü Odası", atmosfer:"atmosfer-umut" },
-  "ust_kat":      { emoji:"🕯️", lokasyon:"Üçüncü Kat — Koridor", atmosfer:"atmosfer-karanlık" },
-  "baba_ile_kavusma":{ emoji:"🤝", lokasyon:"Üst Kat — Gizli Oda", atmosfer:"atmosfer-umut" },
-  "yasli_adam_tanisma":{ emoji:"👴", lokasyon:"Giriş — Bekçinin Odası", atmosfer:"atmosfer-karanlık",
-    npc:{ avatar:"👴", isim:"Maron — Kule Bekçisi", metin:"Aldric'in oğlu... yıllar önce babana söz verdim. Seni koruyacaktım." }},
-  "dusman_hakkinda":{ emoji:"🗡️", lokasyon:"Bekçinin Odası", atmosfer:"atmosfer-karanlık",
-    npc:{ avatar:"👴", isim:"Maron", metin:"Birlik... onlar ölümsüzlük peşinde. Babanın formülü bu kapıyı açıyor. Korkunç bir kapı." }},
-  "b2_baslangic": { emoji:"⚠️", lokasyon:"Üst Kat — Kaçış Başlıyor", atmosfer:"atmosfer-savas" },
-  "b2_formul_sor":{ emoji:"📖", lokasyon:"Gizli Oda — Baba ile", atmosfer:"atmosfer-gizemli",
-    npc:{ avatar:"🧙", isim:"Aldric — Baban", metin:"Formül... onu yıllarca sakladım. Kimse bilmesin diye. Ama artık kanda. Senin kanında, Kael." }},
-  "b2_silah_sahne":{ emoji:"⚔️", lokasyon:"Üst Kat — Birlik Saldırıyor", atmosfer:"atmosfer-savas" },
-  "b2_savas_1":   { emoji:"🗡️", lokasyon:"Savaş — Gölge Asker", atmosfer:"atmosfer-savas" },
-  "b2_savas_2":   { emoji:"🛡️", lokasyon:"Savaş — Kule Bekçisi", atmosfer:"atmosfer-savas" },
-  "b2_savas_gece":{ emoji:"🌑", lokasyon:"Koridor — Gece Yarısı", atmosfer:"atmosfer-gizemli" },
-  "b2_kacis_koridoru":{ emoji:"💨", lokasyon:"Kaçış Koridoru", atmosfer:"atmosfer-savas" },
-  "b2_gizli_gecit":{ emoji:"🕳️", lokasyon:"Gizli Tünel", atmosfer:"atmosfer-karanlık" },
-  "b2_tunel":     { emoji:"🌲", lokasyon:"Orman — Tünel Çıkışı", atmosfer:"atmosfer-umut" },
-  "b2_raven_sirri":{ emoji:"🔮", lokasyon:"Orman Kampı", atmosfer:"atmosfer-gizemli",
-    npc:{ avatar:"🧙", isim:"Aldric — Baban", metin:"Raven... ona her şeyi öğrettim. Büyüyü, sanatı, sevgiyi. Ve o beni kullandı. En acı olan bu." }},
-  "b2_karar":     { emoji:"⚡", lokasyon:"Orman Kampı — Karar Anı", atmosfer:"atmosfer-gizemli" },
-  "b3_giris":     { emoji:"🏛️", lokasyon:"Kule — Gizli Alt Kat", atmosfer:"atmosfer-savas" },
-  "b3_yaklasma":  { emoji:"👁️", lokasyon:"Derinlik Odası — Raven", atmosfer:"atmosfer-gizemli" },
-  "b3_neden":     { emoji:"😔", lokasyon:"Yüzleşme", atmosfer:"atmosfer-gizemli",
-    npc:{ avatar:"🦅", isim:"Raven — Birlik Lideri", metin:"Sen beni anlayamazsın. Hiç kayıp yaşamadın. Ya da yaşadın mı... ve unuttun mu?" }},
-  "b3_son_savas": { emoji:"💀", lokasyon:"Son Savaş", atmosfer:"atmosfer-savas" },
-  "b3_zafer":     { emoji:"🌅", lokasyon:"Zafer — Derinlik Odası", atmosfer:"atmosfer-umut" },
-  "son_iyi":      { emoji:"🕊️", lokasyon:"Final — Barış", atmosfer:"atmosfer-umut" },
-  "son_kendi":    { emoji:"🌟", lokasyon:"Final — Fedakarlık", atmosfer:"atmosfer-umut" },
-};
-
-// ── DÜŞMAN ŞABLONLARI ─────────────────────────────────────────
-const dusmanlar = {
-  "golge_asker": {
-    isim: "Gölge Asker", ascii: "⚔️",
-    can:55, maxCan:55, saldiri:14,
-    zayiflik:"strateji",
-    zayiflikAciklama:"Zayıflık: Savunmasız bir yanı var — doğru hamlede 2x hasar",
-    olumMetni:"Asker yere yığılıyor. Zırh parçaları taşlara çarpıyor.",
+// ════════════════════════════════════════════════
+//  SINIFLAR
+// ════════════════════════════════════════════════
+const siniflar = {
+  savasci: {
+    isim:"Savaşçı", icon:"⚔️",
+    canBonus:20, saldiriBonus:5, savunmaBonus:0,
+    buyuEsigi:5,   // Büyü için gereken güç
+    buyuHasarCarpani:2.5,
+    ciftHamleOlasiligi:0,
+    aciklama:"Güç ve dayanıklılık. Her saldırıda +5 bonus hasar.",
   },
-  "kule_bekcisi": {
-    isim:"Kule Bekçisi", ascii:"🛡️",
-    can:80, maxCan:80, saldiri:20,
-    zayiflik:"saldir",
-    zayiflikAciklama:"Zayıflık: Ağır zırh, yavaş hareket — hızlı saldırıya açık",
-    olumMetni:"Bekçi diz çöküyor. Kaskı düşüyor.",
+  buyucu: {
+    isim:"Büyücü", icon:"🔮",
+    canBonus:0, saldiriBonus:0, savunmaBonus:0,
+    buyuEsigi:3,
+    buyuHasarCarpani:4.0,   // Büyücü büyüsü çok güçlü
+    ciftHamleOlasiligi:0,
+    aciklama:"Daha az güçle büyü kullanır, büyü hasarı 4x.",
   },
-  "gece_yarasi": {
-    isim:"Gece Yarısı", ascii:"🌑",
-    can:45, maxCan:45, saldiri:28,
-    zayiflik:"savun",
-    zayiflikAciklama:"Zayıflık: Saldırıları güçlü ama savunma bozunca kendini kaybediyor",
-    olumMetni:"Karanlık figür çığlık atar gibi bir ses çıkarıp dağılıyor.",
-  },
-  "birlik_lideri": {
-    isim:"Raven — Birlik Lideri", ascii:"👁️",
-    can:120, maxCan:120, saldiri:25,
-    zayiflik:"strateji",
-    zayiflikAciklama:"Zayıflık: Gururu var. Kendini en iyi zannediyor. Bunu kullan.",
-    olumMetni:"Raven yere düşüyor. Maskesi çatlıyor.",
+  hirsiz: {
+    isim:"Hırsız", icon:"🗡️",
+    canBonus:0, saldiriBonus:0, savunmaBonus:3,
+    buyuEsigi:5,
+    buyuHasarCarpani:2.5,
+    ciftHamleOlasiligi:0.3,  // %30 çift hamle
+    aciklama:"%30 ihtimalle tur atlamadan ikinci hamle yapar.",
   },
 };
 
-// ── AKTİF SAVAŞ ──────────────────────────────────────────────
-let aktifSavas = null;
-
-// ── TYPEWRITER SİSTEMİ ────────────────────────────────────────
-/*
-  Bu sistem metni harf harf ekrana yazar.
-  HTML taglarını (span, b vb.) olduğu gibi bırakır,
-  sadece düz metni harf harf çıkarır.
-
-  Nasıl çalışır:
-  1. Metni karakterlere böl
-  2. Her karakteri belirli aralıkla (ms) ekle
-  3. HTML taglarını bir anda ekle (harflerini gösterme)
-*/
-function typewriterYaz(element, htmlMetin, hiz, callback) {
-  element.innerHTML = "";
-  let i = 0;
-  let metin = htmlMetin;
-
-  function sonrakiKarakter() {
-    if (i >= metin.length) {
-      if (callback) callback();
-      return;
-    }
-
-    // HTML tag başlıyor mu? (< karakteri)
-    if (metin[i] === '<') {
-      // Tag'ın sonunu bul (>)
-      const tagSonu = metin.indexOf('>', i);
-      if (tagSonu !== -1) {
-        // Tüm tag'ı bir anda ekle
-        element.innerHTML = metin.substring(0, tagSonu + 1);
-        i = tagSonu + 1;
-      } else {
-        element.innerHTML = metin.substring(0, i + 1);
-        i++;
-      }
-    } else {
-      // Normal karakter — harf harf
-      element.innerHTML = metin.substring(0, i + 1);
-      i++;
-    }
-
-    setTimeout(sonrakiKarakter, hiz);
-  }
-
-  sonrakiKarakter();
+let seciliSinif = "savasci";
+function sinifSec(sinifId, el) {
+  document.querySelectorAll(".sinif-kart").forEach(k => k.classList.remove("secili"));
+  el.classList.add("secili");
+  seciliSinif = sinifId;
 }
 
-// Tüm paragrafları sırayla typewriter ile yaz
-function paragraflaraYaz(paragraflar, container, hiz, tamamCallback) {
-  container.innerHTML = "";
-  let pIndex = 0;
+// ════════════════════════════════════════════════
+//  OYUNCU
+// ════════════════════════════════════════════════
+let oyuncu = {
+  isim:"Kael", sinif:"savasci", sinifIcon:"⚔️",
+  can:100, maxCan:100,
+  cesaret:3,
+  buyuGucu:0, maxBuyuGucu:5, buyuEsigi:5, buyuHasarCarpani:2.5, ciftHamleOlasiligi:0,
+  envanter:["Fener","Hançer"],
+  kararlar:[], puan:0,
+  saldiriGucu:18, savunma:5,
+  aktifSahne:"baslangic",
+};
 
-  function sonrakiParagraf() {
-    if (pIndex >= paragraflar.length) {
-      if (tamamCallback) tamamCallback();
-      return;
+// ════════════════════════════════════════════════
+//  BAŞARIMLAR
+// ════════════════════════════════════════════════
+/*
+  Her başarım:
+  - id: benzersiz kod
+  - icon: emoji
+  - ad: kısa başlık
+  - tanim: ne yapman lazım
+  - kontrol: (oyuncu) => true/false
+*/
+const basarimlar = [
+  { id:"ilk_adim",    icon:"👣", ad:"İlk Adım",        tanim:"Kuleye ilk kez gir",                      kontrol:o=>o.kararlar.includes("izleri_takip")||o.envanter.includes("Babanın Kitabı") },
+  { id:"detective",   icon:"🔍", ad:"Dedektif",         tanim:"Babanın kitabını bul",                    kontrol:o=>o.envanter.includes("Babanın Kitabı") },
+  { id:"sifre_ustat", icon:"🔓", ad:"Şifre Ustası",     tanim:"Zincirli kapının sırrını çöz",            kontrol:o=>o.kararlar.includes("sifre_cozdu") },
+  { id:"guvenilir",   icon:"🤝", ad:"Güvenilir",        tanim:"Maron ile ittifak kur",                   kontrol:o=>o.kararlar.includes("maron_ile_gitti") },
+  { id:"gece_avcisi", icon:"🌑", ad:"Gece Avcısı",      tanim:"Gece Yarısı'nı yen",                      kontrol:o=>o.kararlar.includes("gece_oldu") },
+  { id:"formul_sir",  icon:"📖", ad:"Formülün Sırrı",   tanim:"Formülün ne olduğunu öğren",              kontrol:o=>o.kararlar.includes("formul_ogrendi") },
+  { id:"raven_gercek",icon:"👁️", ad:"Gerçek Yüz",       tanim:"Raven'ın geçmişini ortaya çıkar",         kontrol:o=>o.kararlar.includes("raven_anladi") },
+  { id:"buyu_patl",   icon:"✨", ad:"Büyü Patlaması",   tanim:"Savaşta büyü kullan",                     kontrol:o=>o.kararlar.includes("buyu_kullandi") },
+  { id:"savasci_ruh", icon:"⚔️", ad:"Savaşçı Ruhu",     tanim:"Tüm savaşları kazan",                     kontrol:o=>o.kararlar.includes("tum_savaslar") },
+  { id:"baris",       icon:"🕊️", ad:"Barış",             tanim:"Barış sonu ile bitir",                    kontrol:o=>o.kararlar.includes("baris_sonu") },
+  { id:"fedakar",     icon:"🌟", ad:"Fedakar",           tanim:"Fedakarlık sonu ile bitir",               kontrol:o=>o.kararlar.includes("fedakar_sonu") },
+  { id:"gercek_son",  icon:"🔮", ad:"Gerçek Son",        tanim:"4. bölümü tamamla",                       kontrol:o=>o.kararlar.includes("gercek_son") },
+];
+
+let kazanilanBasarimlar = new Set(JSON.parse(localStorage.getItem("uk_basarimlar")||"[]"));
+let enYuksekSkor = parseInt(localStorage.getItem("uk_en_skor")||"0");
+
+function basarimKontrol() {
+  basarimlar.forEach(b => {
+    if (!kazanilanBasarimlar.has(b.id) && b.kontrol(oyuncu)) {
+      kazanilanBasarimlar.add(b.id);
+      localStorage.setItem("uk_basarimlar", JSON.stringify([...kazanilanBasarimlar]));
+      basarimGoster(b);
     }
-    const p = document.createElement("p");
-    if (pIndex === paragraflar.length - 1) p.classList.add("kursor");
-    container.appendChild(p);
-    typewriterYaz(p, paragraflar[pIndex], hiz, () => {
-      p.classList.remove("kursor");
-      pIndex++;
-      setTimeout(sonrakiParagraf, 200);
+  });
+}
+
+function basarimGoster(b) {
+  document.getElementById("basarim-metin").textContent = b.icon + " " + b.ad + " — " + b.tanim;
+  const el = document.getElementById("basarim-bildirim");
+  el.classList.add("gorun");
+  setTimeout(() => el.classList.remove("gorun"), 3500);
+  sesCal("basarim");
+}
+
+// ════════════════════════════════════════════════
+//  KAYIT SİSTEMİ
+// ════════════════════════════════════════════════
+/*
+  localStorage: tarayıcının kendi hafızası.
+  Sayfa kapansa bile kalıcı.
+  localStorage.setItem("anahtar", "değer") → kaydet
+  localStorage.getItem("anahtar") → oku
+  JSON.stringify() → nesneyi yazıya çevir (kayıt için)
+  JSON.parse() → yazıyı nesneye çevir (okuma için)
+*/
+function oyunuKaydet() {
+  const kayit = {
+    oyuncu: { ...oyuncu },
+    sahne: oyuncu.aktifSahne,
+    kesfedilen: [...kesfedilenler],
+    zaman: new Date().toLocaleString("tr-TR"),
+  };
+  localStorage.setItem("uk_kayit", JSON.stringify(kayit));
+  bildirimGoster("💾 Oyun kaydedildi!");
+  sesCal("kayit");
+}
+
+function kayitYukle() {
+  const veri = localStorage.getItem("uk_kayit");
+  if (!veri) return null;
+  try { return JSON.parse(veri); } catch { return null; }
+}
+
+function kayittenDevam() {
+  const kayit = kayitYukle();
+  if (!kayit) return;
+  oyuncu = { ...kayit.oyuncu };
+  kayit.kesfedilen.forEach(k => kesfedilenler.add(k));
+  ekranGec("ekran-oyun");
+  sahneYukle(kayit.sahne || "baslangic");
+  bildirimGoster("▶️ Kaldığın yerden devam ediliyor");
+}
+
+function skorKaydet() {
+  if (oyuncu.puan > enYuksekSkor) {
+    enYuksekSkor = oyuncu.puan;
+    localStorage.setItem("uk_en_skor", enYuksekSkor);
+  }
+}
+
+// ════════════════════════════════════════════════
+//  SES SİSTEMİ — Web Audio API
+// ════════════════════════════════════════════════
+/*
+  Web Audio API: tarayıcıda ses üretme.
+  Hiçbir dosya gerekmiyor — matematikle ses yaratıyoruz.
+  AudioContext → ses motoru
+  OscillatorNode → frekans üretici (nota gibi)
+  GainNode → ses seviyesi
+*/
+let audioCtx = null;
+let muzikAktif = false;
+let sesAktif = true;
+let muzikInterval = null;
+let muzikTimeout = null;
+
+function audioBaslat() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { console.log("Ses desteklenmiyor"); }
+  }
+}
+
+// Kısa ses efekti çal
+function sesCal(tip) {
+  if (!sesAktif) return;
+  audioBaslat();
+  if (!audioCtx) return;
+
+  const sesler = {
+    tikla:    [[440,0.05,0.1,0.6,"sine"]],
+    hasar:    [[150,0.2,0.3,0.8,"sawtooth"],[200,0.1,0.2,0.6,"sawtooth"]],
+    zafer:    [[523,0.1,0.2,0.7,"sine"],[659,0.1,0.2,0.7,"sine"],[784,0.2,0.4,0.6,"sine"]],
+    basarim:  [[784,0.05,0.15,0.5,"sine"],[988,0.05,0.15,0.5,"sine"],[1175,0.1,0.3,0.4,"sine"]],
+    olum:     [[150,0.3,0.6,0.7,"sawtooth"],[100,0.2,0.8,0.6,"sawtooth"]],
+    buyu:     [[600,0.1,0.2,0.4,"sine"],[800,0.1,0.2,0.4,"sine"],[1000,0.15,0.3,0.3,"sine"]],
+    kayit:    [[440,0.05,0.1,0.4,"sine"],[550,0.05,0.15,0.3,"sine"]],
+    gecis:    [[200,0.15,0.5,0.5,"sine"]],
+  };
+
+  const notalar = sesler[tip] || sesler.tikla;
+  let gecikme = 0;
+  notalar.forEach(([frekans, baslar, biter, seviye, dalga]) => {
+    setTimeout(() => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = dalga; osc.frequency.value = frekans;
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(seviye * 0.3, audioCtx.currentTime + baslar);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + biter);
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + biter + 0.1);
+    }, gecikme);
+    gecikme += 80;
+  });
+}
+
+// Arka plan atmosfer müziği
+const muzikNotalar = {
+  normal:  [196,220,246,261,220,196,175,196],
+  savas:   [130,146,155,130,123,130,138,130],
+  zafer:   [392,440,494,523,494,440,523,392],
+};
+let aktifMuzikTipi = "normal";
+let muzikNIndex = 0;
+
+function muzikCal(tip) {
+  if (!muzikAktif) return;
+  audioBaslat(); if (!audioCtx) return;
+  aktifMuzikTipi = tip || "normal";
+  muzikNIndex = 0;
+  if (muzikTimeout) clearTimeout(muzikTimeout);
+  muzikAdim();
+}
+
+function muzikAdim() {
+  if (!muzikAktif || !audioCtx) return;
+  const notalar = muzikNotalar[aktifMuzikTipi];
+  const nota = notalar[muzikNIndex % notalar.length];
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.type = "sine"; osc.frequency.value = nota;
+  gain.gain.setValueAtTime(0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.1);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + 0.7);
+  muzikNIndex++;
+  muzikTimeout = setTimeout(muzikAdim, 700);
+}
+
+function muzikToggle() {
+  muzikAktif = !muzikAktif;
+  document.getElementById("muzik-btn").classList.toggle("aktif", muzikAktif);
+  if (muzikAktif) { audioBaslat(); muzikAdim(); }
+  else { if (muzikTimeout) clearTimeout(muzikTimeout); }
+}
+
+function sesToggle() {
+  sesAktif = !sesAktif;
+  document.getElementById("ses-btn").classList.toggle("aktif", sesAktif);
+  document.getElementById("ses-btn").textContent = sesAktif ? "🔊" : "🔇";
+}
+
+// ════════════════════════════════════════════════
+//  DİYALOG AĞACI SİSTEMİ
+// ════════════════════════════════════════════════
+/*
+  NPC'lerle gerçek konuşma:
+  - Her NPC'nin bir diyalog ağacı var
+  - Her düğümde NPC'nin sözü + oyuncunun cevap seçenekleri
+  - Seçime göre farklı cevaplar, bazı seçimler oyuncu özelliklerini değiştirir
+  - "bitis" → diyalog bitince hangi sahneye geç
+*/
+const diyalogAgaclari = {
+  "maron_diyalog": {
+    npc: { avatar:"👴", isim:"Maron — Eski Bekçi" },
+    baslangic: "m1",
+    dugumler: {
+      "m1": {
+        npc: "Yıllardır bu kuleyi bekliyorum. Aldric bana söz almıştı... 'Eğer bir gün oğlum gelirse, onu koru.'",
+        secenekler: [
+          { metin:"Ne zamandır buradasın?", sonraki:"m2" },
+          { metin:"Babam senden bahsetmemişti.", sonraki:"m3" },
+          { metin:"Birlik ne zaman geldi?", sonraki:"m4" },
+        ]
+      },
+      "m2": {
+        npc: "On iki yıl. Babanın kaybolduğu gece buradaydım. O gece... kuleye bir şey girdi. Sesler. Sonra sessizlik.",
+        secenekler: [
+          { metin:"O şey ne?", sonraki:"m5" },
+          { metin:"Ve sen gitmedin.", sonraki:"m6" },
+        ]
+      },
+      "m3": {
+        npc: "Beklediğim buydu. Aldric beni korumak için gizledi. Eğer Birlik beni bulsaydı, seni bulamazdı.",
+        secenekler: [
+          { metin:"Düşündüğümden daha akıllı.", sonraki:"m6" },
+          { metin:"Birlik neden onu bırakmadı ki?", sonraki:"m4" },
+        ]
+      },
+      "m4": {
+        npc: "İki yıl önce. İlk başta sadece soruları vardı. Sonra tehditler. Sonra... sessizce girip aramaya başladılar.",
+        secenekler: [
+          { metin:"Babamı buldular mı?", sonraki:"m7" },
+          { metin:"Sen nasıl kaçtın?", sonraki:"m2" },
+        ]
+      },
+      "m5": {
+        npc: "Bilmiyorum. Ama Aldric'in not bıraktığı bir şey var — 'Kule hatırlıyor.' Ne demek istediğini hiçbir zaman anlamadım.",
+        secenekler: [
+          { metin:"Kule hatırlıyor... büyü mi?", sonraki:"m6", etki:(o)=>{ o.kararlar.push("kule_hatirliyor"); o.puan+=30; } },
+        ]
+      },
+      "m6": {
+        npc: "Gitmeyi düşündüm. Birçok kez. Ama her gece yatağa yatarken aynı şeyi düşünüyordum — 'Ya o gün gelirse ve kimse yoksa?'",
+        secenekler: [
+          { metin:"Teşekkür ederim, Maron.", sonraki:"bitis", etki:(o)=>{ o.puan+=40; bildirimGoster("🤝 Maron ile bağ kuruldu +40p"); } },
+          { metin:"Formül hakkında ne biliyorsun?", sonraki:"m8" },
+        ]
+      },
+      "m7": {
+        npc: "Hayır. Çünkü babana hiçbir zaman ulaşamadılar. Ben... onu sakladım. Kulenin bildiği bir yere.",
+        secenekler: [
+          { metin:"Nereye?", sonraki:"bitis", etki:(o)=>{ o.kararlar.push("maron_sirri"); o.puan+=50; bildirimGoster("🔍 Gizli yer öğrenildi +50p"); } },
+        ]
+      },
+      "m8": {
+        npc: "Aldric bana hiç anlatmadı. 'Ne kadar az bilirsen o kadar güvendesin' derdi. Ama... bir kez şunu söyledi: 'Ölüm bir son değil.'",
+        secenekler: [
+          { metin:"Gitmeliyiz artık.", sonraki:"bitis" },
+        ]
+      },
+      "bitis": { bitis: true, sahneSonrasi: "ust_kat" }
+    }
+  },
+
+  "raven_diyalog": {
+    npc: { avatar:"🦅", isim:"Raven — Birlik Lideri" },
+    baslangic: "r1",
+    dugumler: {
+      "r1": {
+        npc: "Geldiğini biliyordum. Aldric'in oğlu... babanı hatırlatan gözlerin var.",
+        secenekler: [
+          { metin:"Onu tanıyorsun.", sonraki:"r2" },
+          { metin:"Beni tanımıyorsun.", sonraki:"r3" },
+          { metin:"Formülü neden istiyorsun?", sonraki:"r4" },
+        ]
+      },
+      "r2": {
+        npc: "Tanımak... evet. En iyi öğrencisiydim. Ve en büyük hayal kırıklığı.",
+        secenekler: [
+          { metin:"O senden nefret ediyor mu?", sonraki:"r5" },
+          { metin:"Ne öğretti sana?", sonraki:"r6" },
+        ]
+      },
+      "r3": {
+        npc: "Seni yirmi yıldır bekliyorum, Kael. Formül kanında — bu yüzden başka birini göndermeye çalıştım. Ama hep sen çıkıyordun.",
+        secenekler: [
+          { metin:"Ne demek istiyorsun?", sonraki:"r4" },
+        ]
+      },
+      "r4": {
+        npc: "Formül... ölümsüzlük değil. Yeniden başlangıç. Ölen her şey yeniden doğar — ama bu sefer acısız. Savaş olmaz. Kayıp olmaz.",
+        secenekler: [
+          { metin:"Bu kulağa güzel geliyor... ama bir şeyler eksik.", sonraki:"r7" },
+          { metin:"İnsanlar ölümlü olmak istiyor.", sonraki:"r8" },
+          { metin:"Annem için mi?", sonraki:"r9", kosul:(o)=>o.kararlar.includes("formul_ogrendi") },
+        ]
+      },
+      "r5": {
+        npc: "Nefret mi? Hayır. Aldric... üzgün. Benim için. Ve bu beni her şeyden çok yakıyor.",
+        secenekler: [
+          { metin:"Dur. Konuş benimle.", sonraki:"r10", etki:(o)=>{ o.kararlar.push("raven_anladi"); o.cesaret=Math.min(5,o.cesaret+1); } },
+          { metin:"O haklı seni üzmekte.", sonraki:"r8" },
+        ]
+      },
+      "r6": {
+        npc: "Her şeyi. Büyünün dilini, tarihin sesini, insanın neden var olduğunu. Ve sonra... kendi kararımı verdiğimde bana 'yanlış' dedi.",
+        secenekler: [
+          { metin:"O yanlış değil miydi?", sonraki:"r7" },
+          { metin:"Belki ikiniz de haklısınız.", sonraki:"r10", etki:(o)=>{ o.kararlar.push("raven_anladi"); } },
+        ]
+      },
+      "r7": {
+        npc: "Eksik olan şeyi söyleyeyim: seçim. Kimse ölmek istemez. Ama ölümsüzlük dayatılamaz. Ve ben... dayatmaya çalışıyorum. Bunu biliyorum.",
+        secenekler: [
+          { metin:"O zaman neden durdurmuyorsun?", sonraki:"r10" },
+        ]
+      },
+      "r8": {
+        npc: "Ölümlülük... bir lüks. Kaybedeceğin şeyin olmadığı zaman sahip. Ben kaybettim. Ve bir daha kaybetmek istemiyorum.",
+        secenekler: [
+          { metin:"Peki ya başkalarının kaybı?", sonraki:"r7" },
+          { metin:"Bu annem için.", sonraki:"r9", kosul:(o)=>o.kararlar.includes("formul_ogrendi") },
+        ]
+      },
+      "r9": {
+        npc: "Evet. Annen... babandan önce benim öğretmenimdi. Öldüğünde... Aldric formülü buldu. Ama 'Bazı şeyler değişmemelidir' dedi. Ben... kabul edemedim.",
+        secenekler: [
+          { metin:"Ben de onu bilmiyordum.", sonraki:"r10", etki:(o)=>{ o.kararlar.push("annem_sirri"); o.puan+=60; bildirimGoster("💔 Annenin sırrı öğrenildi +60p"); } },
+        ]
+      },
+      "r10": {
+        npc: "Bir yol var. Ben yok edebilirim formülü. Ama... Aldric'in bana affetmesi gerekiyor. Ve senden bir şey isteyeceğim.",
+        secenekler: [
+          { metin:"Söyle.", sonraki:"bitis_b4", etki:(o)=>{ o.kararlar.push("raven_anlasma"); } },
+          { metin:"Güvenemem sana.", sonraki:"bitis_savas" },
+        ]
+      },
+      "bitis_b4":   { bitis:true, sahneSonrasi:"b4_raven_anlasma" },
+      "bitis_savas":{ bitis:true, sahneSonrasi:"b3_son_savas" },
+    }
+  },
+};
+
+let aktifDiyalog = null;
+
+function diyalogBaslat(agacId) {
+  const agac = diyalogAgaclari[agacId];
+  if (!agac) return;
+  aktifDiyalog = { agac, mevcutDugum: agac.baslangic, gecmis:[] };
+  document.getElementById("diyalog-kutu").style.display = "block";
+  document.getElementById("diyalog-avatar").textContent = agac.npc.avatar;
+  document.getElementById("diyalog-npc-isim").textContent = agac.npc.isim;
+  document.getElementById("diyalog-gecmis").innerHTML = "";
+  document.getElementById("diyalog-secenekler").innerHTML = "";
+  diyalogDugumGoster(agac.baslangic);
+}
+
+function diyalogDugumGoster(dugumId) {
+  const agac = aktifDiyalog.agac;
+  const dugum = agac.dugumler[dugumId];
+  if (!dugum) return;
+
+  if (dugum.bitis) {
+    aktifDiyalog = null;
+    document.getElementById("diyalog-kutu").style.display = "none";
+    sahneGecis(dugum.sahneSonrasi);
+    return;
+  }
+
+  // NPC sözü ekle
+  const gecmis = document.getElementById("diyalog-gecmis");
+  const npcEl = document.createElement("div");
+  npcEl.className = "diyalog-satir npc";
+  npcEl.innerHTML = `<div class="diyalog-balon"></div>`;
+  gecmis.appendChild(npcEl);
+  gecmis.scrollTop = gecmis.scrollHeight;
+  typewriterYaz(npcEl.querySelector(".diyalog-balon"), dugum.npc, 18, () => {});
+
+  // Seçenekler
+  const secDiv = document.getElementById("diyalog-secenekler");
+  secDiv.innerHTML = "";
+  setTimeout(() => {
+    (dugum.secenekler || []).forEach(s => {
+      if (s.kosul && !s.kosul(oyuncu)) return;
+      const btn = document.createElement("button");
+      btn.className = "diyalog-btn";
+      btn.textContent = s.metin;
+      btn.addEventListener("click", () => {
+        // Oyuncu cevabını geçmişe ekle
+        const oyuncuEl = document.createElement("div");
+        oyuncuEl.className = "diyalog-satir oyuncu";
+        oyuncuEl.innerHTML = `<div class="diyalog-balon">${s.metin}</div>`;
+        gecmis.appendChild(oyuncuEl);
+        gecmis.scrollTop = gecmis.scrollHeight;
+        if (s.etki) s.etki(oyuncu);
+        secDiv.innerHTML = "";
+        setTimeout(() => diyalogDugumGoster(s.sonraki), 400);
+      });
+      secDiv.appendChild(btn);
     });
-  }
-
-  sonrakiParagraf();
+  }, dugum.npc.length * 18 + 300);
 }
 
-// ── HARITA GÜNCELLE ────────────────────────────────────────────
+// ════════════════════════════════════════════════
+//  YARDIMCILAR
+// ════════════════════════════════════════════════
+const kesfedilenler = new Set();
+let gorevPaneliAcik = false;
+
+const sahneKonum = {
+  "baslangic":"dis","ahsap_kapi":"giris","demir_kapi":"giris","pencere_goz":"giris",
+  "raflari_incele":"giris","izleri_takip":"giris","sembol_incele":"giris",
+  "demir_kapi_coz":"giris","demir_kapi_acildi":"giris","kilit_zorla":"giris",
+  "bodrum":"bodrum","bodrum_incele":"bodrum","kristal_dokunma":"bodrum",
+  "ust_kat":"ust","baba_ile_kavusma":"ust","pelerin_incele":"ust",
+  "pencereden_gir":"giris","kapiyi_vur":"giris","gozle":"dis",
+  "yasli_adam_tanisma":"giris","yasli_adam_dur":"dis","yasli_adam_takip":"dis","baba_nerede_sor":"giris","dusman_hakkinda":"giris",
+  "b2_baslangic":"ust","b2_formul_sor":"ust","b2_silah_sahne":"ust","b2_savas_1":"ust","b2_savas_1_zafer":"ust","b2_savas_2":"ust","b2_teslim_ol":"ust","b2_kacis_ara":"ust",
+  "b2_gizli_gecit":"kacis","b2_kacis_koridoru":"kacis","b2_savas_gece":"kacis","b2_fener_kac":"kacis",
+  "b2_tunel":"orman","b2_raven_sirri":"orman","b2_kamp":"orman","b2_karar":"orman",
+  "b3_giris":"geri","b3_yaklasma":"derinlik","b3_bagir":"derinlik","b3_neden":"derinlik","b3_ihanet":"derinlik","b3_son_savas":"derinlik","b3_zafer":"derinlik","b3_olum":"derinlik","son_iyi":"derinlik","son_kendi":"derinlik",
+  "b4_giris":"gizli","b4_raven_anlasma":"gizli","b4_ritual":"gizli","b4_son":"gizli","son_gercek":"gizli",
+};
+const haritaOdalari = [
+  {id:"dis",isim:"Dış Avlu",bolum:1},{id:"giris",isim:"Giriş Katı",bolum:1},
+  {id:"bodrum",isim:"Bodrum",bolum:1},{id:"ust",isim:"Üst Kat",bolum:1},
+  {id:"kacis",isim:"Kaçış",bolum:2},{id:"orman",isim:"Orman",bolum:2},
+  {id:"geri",isim:"Geri Dönüş",bolum:3},{id:"derinlik",isim:"Derinlik",bolum:3},
+  {id:"gizli",isim:"Gizli Kat",bolum:4},
+];
+const sahneGorselleri = {
+  "baslangic":{emoji:"🏰",lokasyon:"Unutulmuş Kule — Dış Avlu",atmosfer:"atmosfer-gizemli"},
+  "ahsap_kapi":{emoji:"🚪",lokasyon:"Ahşap Kapı",atmosfer:"atmosfer-karanlık"},
+  "demir_kapi":{emoji:"⛓",lokasyon:"Demir Kapı",atmosfer:"atmosfer-karanlık"},
+  "pencere_goz":{emoji:"👁️",lokasyon:"Yan Pencere",atmosfer:"atmosfer-gizemli"},
+  "raflari_incele":{emoji:"📚",lokasyon:"Kitaplık",atmosfer:"atmosfer-karanlık"},
+  "izleri_takip":{emoji:"👣",lokasyon:"Koridor",atmosfer:"atmosfer-karanlık"},
+  "bodrum":{emoji:"💎",lokasyon:"Bodrum — Kristal Oda",atmosfer:"atmosfer-gizemli"},
+  "kristal_dokunma":{emoji:"✨",lokasyon:"Kristal Odası",atmosfer:"atmosfer-umut"},
+  "ust_kat":{emoji:"🕯️",lokasyon:"Üçüncü Kat",atmosfer:"atmosfer-karanlık"},
+  "baba_ile_kavusma":{emoji:"🤝",lokasyon:"Gizli Oda",atmosfer:"atmosfer-umut"},
+  "yasli_adam_tanisma":{emoji:"👴",lokasyon:"Bekçinin Odası",atmosfer:"atmosfer-karanlık"},
+  "dusman_hakkinda":{emoji:"👴",lokasyon:"Bekçinin Odası",atmosfer:"atmosfer-karanlık"},
+  "b2_baslangic":{emoji:"⚠️",lokasyon:"Kaçış Başlıyor",atmosfer:"atmosfer-savas"},
+  "b2_formul_sor":{emoji:"📖",lokasyon:"Baba ile",atmosfer:"atmosfer-gizemli"},
+  "b2_silah_sahne":{emoji:"⚔️",lokasyon:"Birlik Saldırıyor",atmosfer:"atmosfer-savas"},
+  "b2_savas_1":{emoji:"🗡️",lokasyon:"Savaş",atmosfer:"atmosfer-savas"},
+  "b2_savas_2":{emoji:"🛡️",lokasyon:"Savaş",atmosfer:"atmosfer-savas"},
+  "b2_savas_gece":{emoji:"🌑",lokasyon:"Gece Yarısı",atmosfer:"atmosfer-gizemli"},
+  "b2_kacis_koridoru":{emoji:"💨",lokasyon:"Kaçış Koridoru",atmosfer:"atmosfer-savas"},
+  "b2_gizli_gecit":{emoji:"🕳️",lokasyon:"Gizli Geçit",atmosfer:"atmosfer-karanlık"},
+  "b2_tunel":{emoji:"🌲",lokasyon:"Orman",atmosfer:"atmosfer-umut"},
+  "b2_raven_sirri":{emoji:"🔮",lokasyon:"Orman Kampı",atmosfer:"atmosfer-gizemli"},
+  "b2_karar":{emoji:"⚡",lokasyon:"Karar Anı",atmosfer:"atmosfer-gizemli"},
+  "b3_giris":{emoji:"🏛️",lokasyon:"Alt Kat",atmosfer:"atmosfer-savas"},
+  "b3_yaklasma":{emoji:"👁️",lokasyon:"Raven — Yüzleşme",atmosfer:"atmosfer-gizemli"},
+  "b3_neden":{emoji:"😔",lokasyon:"Yüzleşme",atmosfer:"atmosfer-gizemli"},
+  "b3_son_savas":{emoji:"💀",lokasyon:"Son Savaş",atmosfer:"atmosfer-savas"},
+  "b3_zafer":{emoji:"🌅",lokasyon:"Zafer",atmosfer:"atmosfer-umut"},
+  "son_iyi":{emoji:"🕊️",lokasyon:"Final — Barış",atmosfer:"atmosfer-umut"},
+  "son_kendi":{emoji:"🌟",lokasyon:"Final — Fedakarlık",atmosfer:"atmosfer-umut"},
+  "b4_giris":{emoji:"🗝️",lokasyon:"Gizli Kat — 4. Bölüm",atmosfer:"atmosfer-gizemli"},
+  "b4_raven_anlasma":{emoji:"🤲",lokasyon:"Anlaşma",atmosfer:"atmosfer-umut"},
+  "b4_ritual":{emoji:"🔮",lokasyon:"Ritüel",atmosfer:"atmosfer-gizemli"},
+  "b4_son":{emoji:"🌌",lokasyon:"Son Sahne",atmosfer:"atmosfer-umut"},
+  "son_gercek":{emoji:"∞",lokasyon:"Gerçek Son",atmosfer:"atmosfer-umut"},
+};
+
+const gorevler = [
+  {id:"g1",metin:"Babanın kitabını bul",                kontrol:o=>o.envanter.includes("Babanın Kitabı"),puan:50},
+  {id:"g2",metin:"Sırrı çöz, zinciri aç",               kontrol:o=>o.kararlar.includes("sifre_cozdu"),puan:70},
+  {id:"g3",metin:"Maron ile tam diyalog kur",            kontrol:o=>o.kararlar.includes("maron_sirri"),puan:80},
+  {id:"g4",metin:"Birliği tanı",                         kontrol:o=>o.kararlar.includes("birlik_ogrendi"),puan:60},
+  {id:"g5",metin:"Gece Yarısı'nı savaşarak yok et",      kontrol:o=>o.kararlar.includes("gece_oldu"),puan:80},
+  {id:"g6",metin:"Raven ile konuş (dövüşme)",            kontrol:o=>o.kararlar.includes("raven_anlasma"),puan:100},
+  {id:"g7",metin:"Annenin sırrını öğren",                kontrol:o=>o.kararlar.includes("annem_sirri"),puan:60},
+  {id:"g8",metin:"Büyü kullan (savaşta)",                kontrol:o=>o.kararlar.includes("buyu_kullandi"),puan:50},
+  {id:"g9",metin:"4. Bölümü tamamla",                    kontrol:o=>o.kararlar.includes("gercek_son"),puan:200},
+];
+
 function haritaGuncelle(sahneAdi) {
   const konumId = sahneKonum[sahneAdi];
   if (konumId) kesfedilenler.add(konumId);
-
   const container = document.getElementById("harita-odalar");
   container.innerHTML = "";
-
   let aktifBolum = null;
-  if (konumId) {
-    const oda = haritaOdalari.find(o => o.id === konumId);
-    if (oda) aktifBolum = oda.bolum;
-  }
-
-  // Bölüm rozeti
-  if (aktifBolum) {
-    const rozet = document.createElement("span");
-    rozet.className = "bolum-rozet";
-    rozet.textContent = `${aktifBolum}. BÖLÜM`;
-    container.appendChild(rozet);
-  }
-
-  haritaOdalari.forEach((oda, i) => {
-    const aktif = oda.id === konumId;
-    const kesfedildi = kesfedilenler.has(oda.id);
-
-    if (!kesfedildi && !aktif) return; // Keşfedilmemişi gösterme
-
-    if (i > 0 && kesfedildi) {
-      const ok = document.createElement("span");
-      ok.className = "harita-ok";
-      ok.textContent = " › ";
-      container.appendChild(ok);
-    }
-
-    const div = document.createElement("div");
-    div.className = "harita-oda" + (kesfedildi ? " kesfedildi" : "") + (aktif ? " aktif" : "");
-    div.textContent = oda.isim;
-    container.appendChild(div);
+  if (konumId) { const o = haritaOdalari.find(o=>o.id===konumId); if(o) aktifBolum=o.bolum; }
+  if (aktifBolum) { const r=document.createElement("span"); r.className="bolum-rozet"; r.textContent=aktifBolum+". BÖLÜM"; container.appendChild(r); }
+  haritaOdalari.forEach((oda,i)=>{
+    const aktif=oda.id===konumId, kesfedildi=kesfedilenler.has(oda.id);
+    if(!kesfedildi&&!aktif) return;
+    if(i>0&&kesfedildi){const ok=document.createElement("span");ok.className="harita-ok";ok.textContent=" › ";container.appendChild(ok);}
+    const div=document.createElement("div");
+    div.className="harita-oda"+(kesfedildi?" kesfedildi":"")+(aktif?" aktif":"");
+    div.textContent=oda.isim; container.appendChild(div);
   });
 }
 
-// ── NPC KONUŞMA ───────────────────────────────────────────────
-function npcGoster(npcVeri) {
-  const kutu = document.getElementById("npc-kutu");
-  if (!npcVeri) { kutu.style.display = "none"; return; }
-
-  kutu.style.display = "block";
-  document.getElementById("npc-avatar").textContent = npcVeri.avatar;
-  document.getElementById("npc-isim-yazi").textContent = npcVeri.isim;
-
-  const metin = document.getElementById("npc-metin");
-  metin.textContent = "";
-  typewriterYaz(metin, `"${npcVeri.metin}"`, 20);
-}
-
-// ── YAN GÖREV GÜNCELLE ────────────────────────────────────────
-let gorevPaneliAcik = true;
 function gorevToggle() {
-  gorevPaneliAcik = !gorevPaneliAcik;
-  document.getElementById("gorev-icerik").style.display = gorevPaneliAcik ? "block" : "none";
-  document.getElementById("gorev-ok").textContent = gorevPaneliAcik ? "▾" : "▸";
+  gorevPaneliAcik=!gorevPaneliAcik;
+  document.getElementById("gorev-icerik").style.display=gorevPaneliAcik?"block":"none";
+  document.getElementById("gorev-ok").textContent=gorevPaneliAcik?"▾":"▸";
 }
 
 function gorevGuncelle() {
-  const container = document.getElementById("gorev-icerik");
-  container.innerHTML = "";
-  let tamam = 0, toplam = gorevler.length;
-
-  gorevler.forEach(g => {
-    const tamamlandi = g.kontrol(oyuncu);
-    if (tamamlandi) tamam++;
-
-    const div = document.createElement("div");
-    div.className = "gorev-satir";
-    div.innerHTML = `
-      <span class="gorev-durum">${tamamlandi ? "✅" : "◻️"}</span>
-      <span class="gorev-metin${tamamlandi ? " tamamlandi" : ""}">${g.metin}</span>
-      <span class="gorev-puan">${g.puan}p</span>
-    `;
+  const container=document.getElementById("gorev-icerik");
+  container.innerHTML="";
+  let tamam=0;
+  gorevler.forEach(g=>{
+    const ok=g.kontrol(oyuncu);
+    if(ok)tamam++;
+    const div=document.createElement("div");
+    div.className="gorev-satir";
+    div.innerHTML=`<span class="gorev-durum">${ok?"✅":"◻️"}</span><span class="gorev-metin${ok?" tamamlandi":""}">${g.metin}</span><span class="gorev-puan">${g.puan}p</span>`;
     container.appendChild(div);
   });
-
-  // Başlığa ilerleme ekle
-  document.getElementById("gorev-baslik").innerHTML =
-    `📜 GÖREVLER <span style="color:#7a7060;font-size:10px">${tamam}/${toplam}</span> <span id="gorev-ok">${gorevPaneliAcik?"▾":"▸"}</span>`;
+  document.getElementById("gorev-ilerleme").innerHTML=`<span style="color:#5a5040;font-size:9px;margin-right:6px">${tamam}/${gorevler.length}</span>`;
 }
 
-// ── BİLDİRİM ─────────────────────────────────────────────────
-function bildirimGoster(metin, sure) {
-  const b = document.getElementById("bildirim");
-  b.textContent = metin;
-  b.style.opacity = "1";
-  setTimeout(() => { b.style.opacity = "0"; }, sure || 2500);
-}
-
-// ── DURUM GÜNCELLE ───────────────────────────────────────────
 function durumGuncelle() {
-  document.getElementById("d-isim").textContent = oyuncu.isim;
-  document.getElementById("d-can-yazi").textContent = oyuncu.can;
-  document.getElementById("d-envanter").textContent = oyuncu.envanter.join(", ");
-  const yildiz = "★".repeat(oyuncu.cesaret) + "☆".repeat(5 - oyuncu.cesaret);
-  document.getElementById("d-cesaret").textContent = yildiz;
-  // Büyü gücü
-  const buyuDolu = "✦".repeat(oyuncu.buyuGucu);
-  const buyuBos  = "✧".repeat(oyuncu.maxBuyuGucu - oyuncu.buyuGucu);
-  document.getElementById("d-buyu").textContent = buyuDolu + buyuBos;
-  // Can bar
-  const bar = document.getElementById("can-bar");
-  const yuzde = (oyuncu.can / oyuncu.maxCan) * 100;
-  bar.style.width = yuzde + "%";
-  bar.style.background = yuzde > 60 ? "#6abf69" : yuzde > 30 ? "#f0a500" : "#e05555";
+  document.getElementById("d-isim").textContent=oyuncu.isim;
+  document.getElementById("d-can-yazi").textContent=oyuncu.can;
+  document.getElementById("d-envanter").textContent=oyuncu.envanter.join(", ");
+  document.getElementById("d-puan").textContent=oyuncu.puan;
+  document.getElementById("d-sinif-icon").textContent=oyuncu.sinifIcon||"⚔️";
+  const y="★".repeat(oyuncu.cesaret)+"☆".repeat(5-oyuncu.cesaret);
+  document.getElementById("d-cesaret").textContent=y;
+  const bd="✦".repeat(oyuncu.buyuGucu)+"✧".repeat(oyuncu.maxBuyuGucu-oyuncu.buyuGucu);
+  document.getElementById("d-buyu").textContent=bd;
+  const bar=document.getElementById("can-bar");
+  const pct=(oyuncu.can/oyuncu.maxCan)*100;
+  bar.style.width=pct+"%";
+  bar.style.background=pct>60?"#6abf69":pct>30?"#f0a500":"#e05555";
+  basarimKontrol();
 }
 
-// ── SAVAŞ SİSTEMİ ────────────────────────────────────────────
-function savaSBaslat(sahne) {
-  const sb = dusmanlar[sahne.dusman];
-  aktifSavas = {
-    dusman: { ...sb, can: sb.can },
-    sahneSonrasi: sahne.sahneSonrasi,
-    olumSahnesi: sahne.olumSahnesi,
-    tur: 1,
-  };
+function bildirimGoster(metin,sure){
+  const b=document.getElementById("bildirim"); b.textContent=metin; b.style.opacity="1";
+  setTimeout(()=>{b.style.opacity="0";},sure||2500);
+}
 
-  const sa = document.getElementById("savas-alani");
-  sa.style.display = "block";
+// Typewriter
+function typewriterYaz(el,html,hiz,cb) {
+  el.innerHTML=""; let i=0;
+  function adim(){
+    if(i>=html.length){if(cb)cb();return;}
+    if(html[i]==="<"){const t=html.indexOf(">",i);if(t!==-1){el.innerHTML=html.substring(0,t+1);i=t+1;}else{el.innerHTML=html.substring(0,i+1);i++;}}
+    else{el.innerHTML=html.substring(0,i+1);i++;}
+    setTimeout(adim,hiz);
+  }
+  adim();
+}
+function paragraflaraYaz(pArr,container,hiz,cb){
+  container.innerHTML=""; let idx=0;
+  function sonraki(){
+    if(idx>=pArr.length){if(cb)cb();return;}
+    const p=document.createElement("p");
+    if(idx===pArr.length-1)p.classList.add("kursor");
+    container.appendChild(p);
+    typewriterYaz(p,pArr[idx],hiz,()=>{p.classList.remove("kursor");idx++;setTimeout(sonraki,180);});
+  }
+  sonraki();
+}
 
-  document.getElementById("dusman-ascii-savas").textContent = aktifSavas.dusman.ascii;
-  document.getElementById("dusman-isim").textContent = aktifSavas.dusman.isim;
-  document.getElementById("d-can-sayi").textContent = aktifSavas.dusman.can;
-  document.getElementById("d-can-max").textContent = aktifSavas.dusman.maxCan;
-  document.getElementById("dusman-can-bar").style.width = "100%";
-  document.getElementById("dusman-zayiflik").textContent = aktifSavas.dusman.zayiflikAciklama;
-  document.getElementById("savas-log").innerHTML = "";
-  document.getElementById("tur-sayac").textContent = "TUR 1";
+// ════════════════════════════════════════════════
+//  SAVAŞ
+// ════════════════════════════════════════════════
+const dusmanlar = {
+  "golge_asker":{isim:"Gölge Asker",ascii:"⚔️",can:55,maxCan:55,saldiri:14,zayiflik:"strateji",zayiflikAciklama:"Zayıflık: Strateji hamlesi 2x hasar",olumMetni:"Asker yere yığılıyor."},
+  "kule_bekcisi":{isim:"Kule Bekçisi",ascii:"🛡️",can:80,maxCan:80,saldiri:20,zayiflik:"saldir",zayiflikAciklama:"Zayıflık: Yavaş — direkt saldırıya açık",olumMetni:"Bekçi diz çöküyor."},
+  "gece_yarasi":{isim:"Gece Yarısı",ascii:"🌑",can:45,maxCan:45,saldiri:28,zayiflik:"savun",zayiflikAciklama:"Zayıflık: Savunma hamlesi 2.5x",olumMetni:"Karanlık dağılıyor."},
+  "birlik_lideri":{isim:"Raven",ascii:"👁️",can:120,maxCan:120,saldiri:25,zayiflik:"strateji",zayiflikAciklama:"Zayıflık: Gururu var — stratejiye açık",olumMetni:"Raven yere düşüyor."},
+};
+let aktifSavas=null;
+
+function savaSBaslat(sahne){
+  const sb=dusmanlar[sahne.dusman];
+  aktifSavas={dusman:{...sb,can:sb.can},sahneSonrasi:sahne.sahneSonrasi,olumSahnesi:sahne.olumSahnesi,tur:1,zaferler:0};
+  document.getElementById("savas-alani").style.display="block";
+  document.getElementById("dusman-ascii-savas").textContent=aktifSavas.dusman.ascii;
+  document.getElementById("dusman-isim").textContent=aktifSavas.dusman.isim;
+  document.getElementById("d-can-sayi").textContent=aktifSavas.dusman.can;
+  document.getElementById("d-can-max").textContent=aktifSavas.dusman.maxCan;
+  document.getElementById("dusman-can-bar").style.width="100%";
+  document.getElementById("dusman-zayiflik").textContent=aktifSavas.dusman.zayiflikAciklama;
+  document.getElementById("savas-log").innerHTML="";
+  document.getElementById("tur-sayac").textContent="TUR 1";
   buyuBarGuncelle();
-
-  savasLogEkle("Savaş başladı!", "log-sistem");
+  savasLogEkle("Savaş başladı!","log-sistem");
+  muzikCal("savas");
 }
 
-function buyuBarGuncelle() {
-  const yuzde = (oyuncu.buyuGucu / oyuncu.maxBuyuGucu) * 100;
-  document.getElementById("buyu-guc-bar").style.width = yuzde + "%";
+function buyuBarGuncelle(){
+  document.getElementById("buyu-guc-bar").style.width=(oyuncu.buyuGucu/oyuncu.maxBuyuGucu*100)+"%";
+}
+function savasLogEkle(m,s){
+  const log=document.getElementById("savas-log");
+  const p=document.createElement("p");p.className=s||"";p.innerHTML=m;
+  log.appendChild(p);log.scrollTop=log.scrollHeight;
 }
 
-function savasLogEkle(metin, sinif) {
-  const log = document.getElementById("savas-log");
-  const p = document.createElement("p");
-  p.className = sinif || "";
-  p.innerHTML = metin;
-  log.appendChild(p);
-  log.scrollTop = log.scrollHeight;
-}
+function savasHamle(hamle,sahneSonrasi,olumSahnesi,secDiv){
+  if(!aktifSavas)return;
+  const d=aktifSavas.dusman;
+  const r=()=>Math.floor(Math.random()*8)-3;
+  let oHasar=oyuncu.saldiriGucu+r();
+  let dHasar=d.saldiri+r();
+  let aciklama="";let logS="";
 
-function savasHamle(hamle, sahneSonrasi, olumSahnesi, secDiv) {
-  if (!aktifSavas) return;
-  const d = aktifSavas.dusman;
-  const rastgele = () => Math.floor(Math.random() * 8) - 3;
+  oyuncu.buyuGucu=Math.min(oyuncu.maxBuyuGucu,oyuncu.buyuGucu+1);
 
-  let oyuncuHasar = oyuncu.saldiriGucu + rastgele();
-  let dusmanHasar = d.saldiri + rastgele();
-  let aciklama = ""; let logSinif = "";
-
-  // Büyü gücü kazanımı: her hamle 1 puan verir
-  oyuncu.buyuGucu = Math.min(oyuncu.maxBuyuGucu, oyuncu.buyuGucu + 1);
-
-  if (hamle === "saldir") {
-    aciklama = "⚔️ Direkt saldırı!"; logSinif = "log-hasar";
-    if (d.zayiflik === "saldir") { oyuncuHasar = Math.floor(oyuncuHasar * 2); aciklama += " <span style='color:#6abf69'>ZAYIF NOKTA! ×2</span>"; }
-  } else if (hamle === "savun") {
-    aciklama = "🛡️ Savunmaya geçtin."; logSinif = "log-savun";
-    oyuncuHasar = Math.floor(oyuncuHasar * 0.6);
-    dusmanHasar = Math.max(0, dusmanHasar - oyuncu.savunma - 8);
-    if (d.zayiflik === "savun") { oyuncuHasar = Math.floor(oyuncuHasar * 2.5); aciklama += " <span style='color:#6abf69'>ZAYIF NOKTA!</span>"; }
-  } else if (hamle === "strateji") {
-    aciklama = "🎯 Stratejik hamle!"; logSinif = "log-strateji";
-    if (d.zayiflik === "strateji") { oyuncuHasar = Math.floor(oyuncuHasar * 2.2); aciklama += " <span style='color:#6abf69'>ZAYIF NOKTA! ×2.2</span>"; }
-    else { dusmanHasar = Math.floor(dusmanHasar * 1.4); aciklama += " <span style='color:#e05555'>Yanlış! Düşman fırsatı kullandı.</span>"; }
-  } else if (hamle === "buyu") {
-    // BÜYÜ HAMLESİ
-    aciklama = "✨ Büyü patlaması!"; logSinif = "log-buyu";
-    oyuncuHasar = Math.floor((oyuncu.saldiriGucu * 2.5) + rastgele());
-    dusmanHasar = Math.floor(dusmanHasar * 0.3); // Büyü kullanınca düşman şaşırır
-    oyuncu.buyuGucu = 0; // Büyü gücü sıfırla
-    // Büyü animasyonu
-    document.getElementById("sahne-ascii").style.animation = "buyuEfekt 0.8s ease";
-    setTimeout(() => { document.getElementById("sahne-ascii").style.animation = ""; }, 800);
-    bildirimGoster("✨ Büyü gücü kullanıldı!", 2000);
+  if(hamle==="saldir"){
+    aciklama="⚔️ Direkt saldırı!";logS="log-hasar";
+    if(d.zayiflik==="saldir"){oHasar=Math.floor(oHasar*2);aciklama+=" <span style='color:#6abf69'>ZAYIF NOKTA ×2!</span>";}
+    // Hırsız çift hamle
+    if(oyuncu.sinif==="hirsiz"&&Math.random()<oyuncu.ciftHamleOlasiligi){oHasar=Math.floor(oHasar*1.8);aciklama+=" <span style='color:#c9a84c'>Çift Hamle!</span>";}
+  } else if(hamle==="savun"){
+    aciklama="🛡️ Savunmaya geçtin.";logS="log-savun";
+    oHasar=Math.floor(oHasar*0.6);
+    dHasar=Math.max(0,dHasar-oyuncu.savunma-8);
+    if(d.zayiflik==="savun"){oHasar=Math.floor(oHasar*2.5);aciklama+=" <span style='color:#6abf69'>ZAYIF NOKTA!</span>";}
+  } else if(hamle==="strateji"){
+    aciklama="🎯 Stratejik hamle!";logS="log-strateji";
+    if(d.zayiflik==="strateji"){oHasar=Math.floor(oHasar*2.2);aciklama+=" <span style='color:#6abf69'>ZAYIF NOKTA ×2.2!</span>";}
+    else{dHasar=Math.floor(dHasar*1.4);aciklama+=" <span style='color:#e05555'>Yanlış hamle!</span>";}
+  } else if(hamle==="buyu"){
+    aciklama="✨ Büyü Patlaması!";logS="log-buyu";
+    oHasar=Math.floor((oyuncu.saldiriGucu*oyuncu.buyuHasarCarpani)+r());
+    dHasar=Math.floor(dHasar*0.2);
+    oyuncu.buyuGucu=0;
+    oyuncu.kararlar.push("buyu_kullandi");
+    document.getElementById("sahne-ascii").style.animation="buyuEfekt 0.8s ease";
+    setTimeout(()=>document.getElementById("sahne-ascii").style.animation="",800);
+    sesCal("buyu"); bildirimGoster("✨ Büyü gücü kullanıldı!");
   }
 
-  oyuncuHasar = Math.max(1, oyuncuHasar);
-  dusmanHasar = Math.max(0, dusmanHasar);
+  oHasar=Math.max(1,oHasar); dHasar=Math.max(0,dHasar);
+  d.can=Math.max(0,d.can-oHasar);
+  oyuncu.can=Math.max(0,oyuncu.can-dHasar);
 
-  d.can = Math.max(0, d.can - oyuncuHasar);
-  oyuncu.can = Math.max(0, oyuncu.can - dusmanHasar);
+  savasLogEkle(`Tur ${aktifSavas.tur}: ${aciklama}`,logS);
+  savasLogEkle(`› Verilen: <span class="log-zafer">-${oHasar}</span> | Alınan: <span class="log-hasar-al">-${dHasar}</span>`,"");
 
-  savasLogEkle(`Tur ${aktifSavas.tur}: ${aciklama}`, logSinif);
-  savasLogEkle(`› Sen <span class='log-zafer'>-${oyuncuHasar}</span> verdin | Aldın: <span class='log-hasar-al'>-${dusmanHasar}</span>`, "");
+  const dPct=(d.can/d.maxCan*100);
+  document.getElementById("dusman-can-bar").style.width=dPct+"%";
+  document.getElementById("d-can-sayi").textContent=d.can;
+  document.getElementById("tur-sayac").textContent=`TUR ${aktifSavas.tur}`;
 
-  // Düşman can bar
-  const dYuzde = (d.can / d.maxCan) * 100;
-  document.getElementById("dusman-can-bar").style.width = dYuzde + "%";
-  document.getElementById("d-can-sayi").textContent = d.can;
-  document.getElementById("tur-sayac").textContent = `TUR ${aktifSavas.tur}`;
+  document.getElementById("dusman-ascii-savas").classList.add("dusman-vurulan");
+  setTimeout(()=>document.getElementById("dusman-ascii-savas").classList.remove("dusman-vurulan"),300);
+  if(dHasar>0){document.getElementById("oyun-kutusu").classList.add("sarsil");setTimeout(()=>document.getElementById("oyun-kutusu").classList.remove("sarsil"),350);sesCal("hasar");}
 
-  // Düşman vurulma animasyonu
-  const dAscii = document.getElementById("dusman-ascii-savas");
-  dAscii.classList.add("dusman-vurulan");
-  setTimeout(() => dAscii.classList.remove("dusman-vurulan"), 300);
+  buyuBarGuncelle(); durumGuncelle(); aktifSavas.tur++;
 
-  // Oyuncu hasar aldıysa sarsıl
-  if (dusmanHasar > 0) {
-    document.getElementById("oyun-kutusu").classList.add("sarsil");
-    setTimeout(() => document.getElementById("oyun-kutusu").classList.remove("sarsil"), 350);
-  }
-
-  buyuBarGuncelle();
-  durumGuncelle();
-  aktifSavas.tur++;
-
-  // Sonuç kontrolü
-  if (d.can <= 0) {
-    setTimeout(() => savasKazan(sahneSonrasi), 700);
-  } else if (oyuncu.can <= 0) {
-    setTimeout(() => savasKaybe(olumSahnesi), 700);
-  } else {
-    // Savaş devam
-    setTimeout(() => {
-      secDiv.querySelectorAll("button").forEach(b => b.disabled = false);
-    }, 450);
-  }
+  if(d.can<=0){setTimeout(()=>savasKazan(sahneSonrasi),700);}
+  else if(oyuncu.can<=0){setTimeout(()=>savasKaybe(olumSahnesi),700);}
+  else{setTimeout(()=>secDiv.querySelectorAll("button").forEach(b=>b.disabled=false),450);}
 }
 
-function savasKazan(sahneSonrasi) {
-  if (!aktifSavas) return;
-  savasLogEkle(`✦ ${aktifSavas.dusman.olumMetni}`, "log-zafer");
-  // Gece yarısı için özel kayıt
-  if (aktifSavas.dusman.isim === "Gece Yarısı") oyuncu.kararlar.push("gece_oldu");
-  oyuncu.puan += 100;
-  bildirimGoster("⚔️ Zafer! +100 puan", 2500);
-  setTimeout(() => {
-    document.getElementById("savas-alani").style.display = "none";
-    aktifSavas = null;
-    sahneGecis(sahneSonrasi);
-  }, 1200);
+function savasKazan(sahneSonrasi){
+  if(!aktifSavas)return;
+  savasLogEkle(`<span class="log-zafer">⚔ ZAFER! ${aktifSavas.dusman.olumMetni}</span>`,"log-sistem");
+  if(aktifSavas.dusman.isim==="Gece Yarısı") oyuncu.kararlar.push("gece_oldu");
+  oyuncu.puan+=100; sesCal("zafer"); muzikCal("normal");
+  bildirimGoster("⚔️ Zafer! +100 puan");
+  // Tüm savaşları kazandı mı?
+  aktifSavas._zaferler=(aktifSavas._zaferler||0)+1;
+  setTimeout(()=>{document.getElementById("savas-alani").style.display="none";aktifSavas=null;sahneGecis(sahneSonrasi);},1200);
 }
 
-function savasKaybe(olumSahnesi) {
-  savasLogEkle("💀 Düştün...", "log-hasar");
-  oyuncu.can = 100;
-  setTimeout(() => {
-    document.getElementById("savas-alani").style.display = "none";
-    aktifSavas = null;
-    sahneGecis(olumSahnesi);
-  }, 1200);
+function savasKaybe(olumSahnesi){
+  savasLogEkle("💀 Düştün...","log-hasar");
+  oyuncu.can=100; sesCal("olum");
+  setTimeout(()=>{document.getElementById("savas-alani").style.display="none";aktifSavas=null;sahneGecis(olumSahnesi);},1200);
 }
 
-// ── SAHNELER ─────────────────────────────────────────────────
+// ════════════════════════════════════════════════
+//  SAHNELER
+// ════════════════════════════════════════════════
 const sahneler = {
-  "baslangic": {
-    metin: [
-      "Sonbaharın soğuk nefesi ensende. <span class='vurgu'>Gri gökyüzü</span> altında, yıllar önce terk edilmiş bir kule yükseliyor karşında.",
-      "Bu kule... <span class='cesur'>Babanın kaybolduğu yer.</span> Köylüler yaklaşmaz buraya. \"Lanetli\" derler.",
-      "Kulede üç kapı var: solda <span class='vurgu'>çürük ahşap kapı</span>, ortada <span class='vurgu'>demir zincirli kapı</span>, sağda <span class='vurgu'>gizli pencere</span>."
-    ],
-    secenekler: [
-      { metin: "Ahşap kapıdan içeri gir", sonraki: "ahsap_kapi" },
-      { metin: "Demir zinciri kır", sonraki: "demir_kapi", etki: (o) => { o.cesaret = Math.min(5,o.cesaret+1); bildirimGoster("★ Cesaret arttı!"); } },
-      { metin: "Pencereden dikkatlice bak", sonraki: "pencere_goz" },
-    ]
-  },
-  "ahsap_kapi": {
-    metin: [
-      "Kapıyı itince <span class='vurgu'>gıcırdayan bir ses</span> tüm ormanı doldurur.",
-      "Duvarlar nemli. Raflar çürümüş. Yerdeki toz üzerinde <span class='cesur'>taze ayak izleri</span> var.",
-    ],
-    secenekler: [
-      { metin: "İzleri takip et", sonraki: "izleri_takip", etki: (o) => o.kararlar.push("izleri_takip") },
-      { metin: "Rafları incele", sonraki: "raflari_incele" },
-      { metin: "Geri dön", sonraki: "baslangic" },
-    ]
-  },
-  "demir_kapi": {
-    metin: [
-      "Zincire elini atıyorsun. Soğuk demir avucunu kesercesine.",
-      "Bir halka üzerinde <span class='cesur'>babanın mühründeki sembol</span> var. Bu tesadüf olamaz."
-    ],
-    secenekler: [
-      { metin: "Sembolü incele", sonraki: "sembol_incele", etki: (o) => o.kararlar.push("sembol_gordu") },
-      { metin: "Hançerle kilidi zorla", sonraki: "kilit_zorla" },
-      { metin: "Geri çekil", sonraki: "baslangic" },
-    ]
-  },
-  "pencere_goz": {
-    metin: [
-      "İçeride bir <span class='cesur'>ışık titriyor.</span> Mum. Ve o biri <span class='vurgu'>seni görüyor.</span>",
-    ],
-    secenekler: [
-      { metin: "Pencereden sız", sonraki: "pencereden_gir", etki: (o) => o.kararlar.push("pencere_secti") },
-      { metin: "Kapıya vur", sonraki: "kapiyi_vur" },
-      { metin: "Gözlemle", sonraki: "gozle" },
-    ]
-  },
-  "izleri_takip": {
-    metin: [
-      "İzler dar merdivene çıkıyor. Başında <span class='cesur'>babanın mor pelerini</span>.",
-    ],
-    secenekler: [
-      { metin: "Merdiveni çık", sonraki: "ust_kat" },
-      { metin: "Pelerini incele", sonraki: "pelerin_incele" },
-    ]
-  },
-  "raflari_incele": {
-    metin: [
-      "Deri ciltli kitap. Nemden korunmuş. Babanın yazısı: <span class='cesur'>\"Kael — zincirli kapının sırrı senin adındadır.\"</span>",
-    ],
-    secenekler: [
-      { metin: "Kitabı al, zincirli kapıya git", sonraki: "demir_kapi_coz", etki: (o) => { o.envanter.push("Babanın Kitabı"); o.kararlar.push("kitap_buldu"); bildirimGoster("📚 Babanın Kitabı alındı! +50p"); o.puan+=50; } },
-    ]
-  },
-  "sembol_incele": {
-    metin: [
-      "<span class='cesur'>K... A... E... L.</span> Senin adın. Baban bu kilidi sen için hazırlamış."
-    ],
-    secenekler: [
-      { metin: "Her harfi sırayla bas", sonraki: "demir_kapi_acildi", etki: (o) => { o.kararlar.push("sifre_cozdu"); bildirimGoster("🔓 Kilit çözüldü! +70p"); o.puan+=70; } },
-    ]
-  },
-  "kilit_zorla": {
-    metin: ["<span class='kirmizi'>Çat.</span> Hançerin ucu kırılıyor."],
-    secenekler: [{ metin: "Farklı yol dene", sonraki: "baslangic", etki: (o) => { o.envanter = o.envanter.map(e => e==="Hançer"?"Kırık Hançer":e); } }]
-  },
-  "pencereden_gir": {
-    metin: ["Yaşlı adam seni görüyor. \"Sen... Kael misin?\" diyor titreyerek."],
-    secenekler: [
-      { metin: "\"Evet. Sen kimsin?\"", sonraki: "yasli_adam_tanisma" },
-      { metin: "\"Babam nerede?\"", sonraki: "baba_nerede_sor" },
-    ]
-  },
-  "kapiyi_vur": {
-    metin: ["Kapı içeriden açılıyor. Yaşlı bir el."],
-    secenekler: [
-      { metin: "İçeri gir", sonraki: "pencereden_gir" },
-      { metin: "\"Ben Kael, Aldric'in oğluyum\"", sonraki: "yasli_adam_tanisma" },
-    ]
-  },
-  "gozle": {
-    metin: ["Birkaç dakika sonra arka kapıdan yaşlı biri çıkıyor. Elinde babanın <span class='vurgu'>mor pelerini</span>."],
-    secenekler: [
-      { metin: "\"Dur!\"", sonraki: "yasli_adam_dur", etki: (o) => o.cesaret=Math.min(5,o.cesaret+1) },
-      { metin: "Sessizce takip et", sonraki: "yasli_adam_takip" },
-    ]
-  },
-  "demir_kapi_coz": {
-    metin: ["<span class='vurgu'>K... A... E... L...</span> <span class='cesur'>Tık. Tık. Tık. Tık.</span> Zincir düşüyor."],
-    secenekler: [{ metin: "Merdivenden in", sonraki: "bodrum" }]
-  },
-  "demir_kapi_acildi": {
-    metin: ["Dördüncü tıkta zincir çözülüyor. Kapı açılıyor."],
-    secenekler: [{ metin: "İçeri gir", sonraki: "bodrum" }]
-  },
-  "pelerin_incele": {
-    metin: ["<span class='vurgu'>Hâlâ sıcak.</span> Altında not: <span class='cesur'>\"3. kat. — A\"</span>"],
-    secenekler: [{ metin: "Koş, merdiveni çık", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("notu_aldi"); o.envanter.push("Babanın Notu"); bildirimGoster("📜 Not alındı!"); } }]
-  },
-  "yasli_adam_tanisma": {
-    metin: [
-      "\"Aldric'in oğlu... sonunda geldin.\"",
-      "\"Ben Maron. Babanı <span class='vurgu'>sakladım</span> — onu isteyenlerden.\""
-    ],
-    secenekler: [
-      { metin: "\"Götür beni\"", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("maron_ile_gitti"); bildirimGoster("✅ Yan Görev: Maron'a güvenildi"); } },
-      { metin: "\"Kim peşinde babanın?\"", sonraki: "dusman_hakkinda" },
-    ]
-  },
-  "dusman_hakkinda": {
-    metin: ["\"Birlik... babanın formülünü istiyor. <span class='vurgu'>Ölümsüz ordu</span> yapacaklar.\""],
-    secenekler: [{ metin: "\"Götür beni.\"", sonraki: "ust_kat", etki: (o) => { o.kararlar.push("birlik_ogrendi"); bildirimGoster("⚠️ Birlik hakkında bilgi edinildi"); } }]
-  },
-  "baba_nerede_sor": {
-    metin: ["\"Yukarıda. Ama dikkatli ol. Kule onu <span class='kirmizi'>değiştirdi</span>.\""],
-    secenekler: [{ metin: "Takip et", sonraki: "ust_kat" }]
-  },
-  "yasli_adam_dur": {
-    metin: ["\"Ben Kael. Aldric'in oğluyum.\" Adam döndü. Yüzünde <span class='vurgu'>hem korku hem umut</span>."],
-    secenekler: [{ metin: "\"Babam nerede?\"", sonraki: "yasli_adam_tanisma" }]
-  },
-  "yasli_adam_takip": {
-    metin: ["Adam gizli bir kapak açıyor. İçerisi karanlık."],
-    secenekler: [
-      { metin: "Kapaktan in", sonraki: "bodrum" },
-      { metin: "Adama seslen", sonraki: "yasli_adam_dur" },
-    ]
-  },
-  "ust_kat": {
-    metin: ["Üçüncü kat. Dar koridor. Sonunda <span class='vurgu'>ışık sızan bir kapı.</span>"],
-    secenekler: [{ metin: "Kapıyı aç", sonraki: "baba_ile_kavusma" }]
-  },
-  "bodrum": {
-    metin: [
-      "Kristaller içinde donmuş figür. Babanın yüzü. <span class='cesur'>Hayatta.</span>"
-    ],
-    secenekler: [
-      { metin: "Kristale dokun", sonraki: "kristal_dokunma" },
-      { metin: "Etrafı incele", sonraki: "bodrum_incele" },
-    ]
-  },
-  "kristal_dokunma": {
-    metin: [
-      "<span class='vurgu'>Elektrik gibi</span> bir his. Babanın gözleri açılıyor.",
-      "\"Kael.\" <span class='cesur'>\"Beni buldun.\"</span>"
-    ],
-    secenekler: [{ metin: "[ 2. Bölüm Başlıyor ]", sonraki: "b2_baslangic" }]
-  },
-  "bodrum_incele": {
-    metin: ["\"Adını söyle, zinciri kır.\" Kristal, içindekinin adını bilen tarafından açılır."],
-    secenekler: [{ metin: "\"Aldric\" diye fısılda", sonraki: "kristal_dokunma" }]
-  },
-  "baba_ile_kavusma": {
-    metin: [
-      "<span class='cesur'>Baban.</span> Yatakta. Gözlerini açıyor.",
-      "Yıllar süren arayış. Ve şimdi burada."
-    ],
-    secenekler: [{ metin: "[ 2. Bölüm Başlıyor ]", sonraki: "b2_baslangic" }]
-  },
+  "baslangic":{metin:["Sonbaharın soğuk nefesi ensende. <span class='vurgu'>Gri gökyüzü</span> altında terk edilmiş kule yükseliyor.","<span class='cesur'>Babanın kaybolduğu yer.</span> Köylüler yaklaşmaz. Lanetli derler.","Üç kapı: solda <span class='vurgu'>ahşap</span>, ortada <span class='vurgu'>zincirli</span>, sağda <span class='vurgu'>gizli pencere</span>."],secenekler:[{metin:"Ahşap kapıdan gir",sonraki:"ahsap_kapi"},{metin:"Zinciri kır",sonraki:"demir_kapi",etki:o=>{o.cesaret=Math.min(5,o.cesaret+1);bildirimGoster("★ Cesaret arttı!");}},{metin:"Pencereden bak",sonraki:"pencere_goz"}]},
+  "ahsap_kapi":{metin:["Kapı gıcırdar. Koridor karanlık, fenerin ışığı ilerliyor.","Raflar çürümüş. Yerde <span class='cesur'>taze ayak izleri</span>."],secenekler:[{metin:"İzleri takip et",sonraki:"izleri_takip",etki:o=>o.kararlar.push("izleri_takip")},{metin:"Rafları incele",sonraki:"raflari_incele"},{metin:"Geri dön",sonraki:"baslangic"}]},
+  "demir_kapi":{metin:["Halkada <span class='cesur'>babanın mühründeki sembol.</span> Tesadüf olamaz."],secenekler:[{metin:"Sembolü incele",sonraki:"sembol_incele",etki:o=>o.kararlar.push("sembol_gordu")},{metin:"Hançerle zorla",sonraki:"kilit_zorla"},{metin:"Geri çekil",sonraki:"baslangic"}]},
+  "pencere_goz":{metin:["İçeride mum ışığı. Ve o biri <span class='vurgu'>seni görüyor.</span>"],secenekler:[{metin:"Pencereden sız",sonraki:"pencereden_gir",etki:o=>o.kararlar.push("pencere_secti")},{metin:"Kapıya vur",sonraki:"kapiyi_vur"},{metin:"Gözlemle",sonraki:"gozle"}]},
+  "izleri_takip":{metin:["İzler merdivene çıkıyor. Başında <span class='cesur'>babanın mor pelerini.</span>"],secenekler:[{metin:"Merdiveni çık",sonraki:"ust_kat"},{metin:"Pelerini incele",sonraki:"pelerin_incele"}]},
+  "raflari_incele":{metin:["Nemden korunmuş deri cilt. Babanın yazısı: <span class='cesur'>\"Zincirli kapının sırrı — K-A-E-L.\"</span>"],secenekler:[{metin:"Kitabı al",sonraki:"demir_kapi_coz",etki:o=>{o.envanter.push("Babanın Kitabı");o.kararlar.push("kitap_buldu");o.puan+=50;bildirimGoster("📚 Kitap alındı +50p");}}]},
+  "sembol_incele":{metin:["<span class='cesur'>K... A... E... L.</span> Senin adın. Baban bunu sen için hazırlamış."],secenekler:[{metin:"Her harfi bas",sonraki:"demir_kapi_acildi",etki:o=>{o.kararlar.push("sifre_cozdu");o.puan+=70;bildirimGoster("🔓 Şifre çözüldü +70p");}}]},
+  "kilit_zorla":{metin:["<span class='kirmizi'>Çat.</span> Hançerin ucu kırılıyor."],secenekler:[{metin:"Farklı yol",sonraki:"baslangic",etki:o=>{o.envanter=o.envanter.map(e=>e==="Hançer"?"Kırık Hançer":e);}}]},
+  "pencereden_gir":{metin:["Yaşlı adam: <span class='cesur'>\"Sen... Kael misin?\"</span>"],secenekler:[{metin:"\"Evet. Sen kimsin?\"",sonraki:"yasli_adam_tanisma"},{metin:"\"Babam nerede?\"",sonraki:"baba_nerede_sor"}]},
+  "kapiyi_vur":{metin:["Uzun sessizlik. Kapı içeriden açılıyor."],secenekler:[{metin:"İçeri gir",sonraki:"pencereden_gir"},{metin:"\"Ben Kael\"",sonraki:"yasli_adam_tanisma"}]},
+  "gozle":{metin:["Arka kapıdan yaşlı biri çıkıyor. Elinde babanın <span class='vurgu'>mor pelerini.</span>"],secenekler:[{metin:"\"Dur!\"",sonraki:"yasli_adam_dur",etki:o=>o.cesaret=Math.min(5,o.cesaret+1)},{metin:"Sessizce takip et",sonraki:"yasli_adam_takip"}]},
+  "demir_kapi_coz":{metin:["<span class='vurgu'>K...A...E...L...</span> <span class='cesur'>Tık tık tık tık.</span> Zincir düşüyor."],secenekler:[{metin:"Merdivenden in",sonraki:"bodrum"}]},
+  "demir_kapi_acildi":{metin:["Dördüncü tıkta zincir çözülüyor. Kapı açılıyor."],secenekler:[{metin:"İçeri gir",sonraki:"bodrum"}]},
+  "pelerin_incele":{metin:["<span class='vurgu'>Hâlâ sıcak.</span> Not: <span class='cesur'>\"3. kat. — A\"</span>"],secenekler:[{metin:"Merdiveni çık",sonraki:"ust_kat",etki:o=>{o.kararlar.push("notu_aldi");o.envanter.push("Babanın Notu");bildirimGoster("📜 Not alındı");}}]},
 
-  // ══ 2. BÖLÜM ══
-  "b2_baslangic": {
-    metin: [
-      "<span class='vurgu'>— İKİNCİ BÖLÜM: KAÇIŞ —</span>",
-      "Baban: \"Gitmeliyiz. <span class='kirmizi'>Şimdi.</span>\" Uzaktan demir çizmeler.",
-    ],
-    secenekler: [
-      { metin: "\"Formül nedir?\"", sonraki: "b2_formul_sor" },
-      { metin: "Soru yok — kaçış yolu bul", sonraki: "b2_kacis_ara", etki: (o) => o.cesaret=Math.min(5,o.cesaret+1) },
-    ]
-  },
-  "b2_formul_sor": {
-    metin: [
-      "\"Formül... <span class='vurgu'>ölüleri geri getirebiliyor.</span>\"",
-      "\"Formülü artık <span class='kirmizi'>senin kanında.</span> Seni ele geçirirlerse bulurlar.\""
-    ],
-    secenekler: [{ metin: "\"Yani ben bir silahım.\"", sonraki: "b2_silah_sahne", etki: (o) => o.kararlar.push("formul_ogrendi") }]
-  },
-  "b2_silah_sahne": {
-    metin: [
-      "<span class='cesur'>Kapı gürültüyle açılıyor.</span> İki Gölge Asker.",
-      "\"Kael adındaki kişi teslim olacak.\""
-    ],
-    secenekler: [
-      { metin: "⚔️ Savaş!", sonraki: "b2_savas_1", etki: (o) => o.kararlar.push("savasti") },
-      { metin: "\"Tamam. Gidiyorum.\"", sonraki: "b2_teslim_ol" },
-    ]
-  },
-  "b2_savas_1": {
-    tip:"savas", dusman:"golge_asker",
-    metin: ["<span class='cesur'>Gölge Asker sana doğru yürüyor.</span> Hamleni seç."],
-    sahneSonrasi:"b2_savas_1_zafer", olumSahnesi:"b2_olum_asker"
-  },
-  "b2_savas_1_zafer": {
-    metin: [
-      "<span class='yesil'>İlk asker düşüyor.</span> İkincisi telsizine uzanıyor: <span class='kirmizi'>\"Takviye!\"</span>",
-      "Baban: \"Arka kapı var. Hızlı.\""
-    ],
-    secenekler: [
-      { metin: "Arka kapıya koş", sonraki: "b2_kacis_koridoru" },
-      { metin: "İkincisini de durdur", sonraki: "b2_savas_2" },
-    ]
-  },
-  "b2_savas_2": {
-    tip:"savas", dusman:"kule_bekcisi",
-    metin: ["İkinci asker — daha ağır, daha yavaş. <span class='cesur'>Ama bir darbesi yeter.</span>"],
-    sahneSonrasi:"b2_kacis_koridoru", olumSahnesi:"b2_olum_asker"
-  },
-  "b2_teslim_ol": {
-    metin: [
-      "Askerler seni götürüyor. Baban <span class='kirmizi'>\"HAYIR!\"</span> diye bağırıyor.",
-      "<span class='kirmizi'>Teslim olmamalıydın.</span>"
-    ],
-    secenekler: [{ metin: "[ Tekrar Dene ]", sonraki: "b2_baslangic", etki: (o) => o.can=100 }]
-  },
-  "b2_olum_asker": {
-    metin: ["Asker son darbeyi indiriyor. <span class='kirmizi'>Yere çöküyorsun.</span>"],
-    secenekler: [{ metin: "[ Tekrar Dene ]", sonraki: "b2_silah_sahne", etki: (o) => o.can=100 }]
-  },
-  "b2_kacis_ara": {
-    metin: [
-      "Duvarda bir iz. Taşlar arasında <span class='vurgu'>gizli geçit.</span>",
-    ],
-    secenekler: [
-      { metin: "Geçitten geç", sonraki: "b2_gizli_gecit", etki: (o) => o.kararlar.push("gecit_buldu") },
-      { metin: "Kapıdan çık (riskli)", sonraki: "b2_silah_sahne" },
-    ]
-  },
-  "b2_gizli_gecit": {
-    metin: ["Geçit sizi kulenin altına, taş tünele çıkarıyor. <span class='yesil'>Geçtiniz.</span>"],
-    secenekler: [{ metin: "Tünelde koş", sonraki: "b2_tunel" }]
-  },
-  "b2_kacis_koridoru": {
-    metin: [
-      "Köşeyi dönerken <span class='kirmizi'>Gece Yarısı</span> çıkıyor — kulenin ruhu.",
-    ],
-    secenekler: [
-      { metin: "Savaş!", sonraki: "b2_savas_gece", etki: (o) => o.kararlar.push("gece_ile_savasti") },
-      { metin: "Fenerle geç", sonraki: "b2_fener_kac", kosul: (o) => o.envanter.includes("Fener") },
-    ]
-  },
-  "b2_savas_gece": {
-    tip:"savas", dusman:"gece_yarasi",
-    metin: ["<span class='cesur'>Gece Yarısı</span> — şekil değiştiren karanlık. Savunma onun zayıflığı."],
-    sahneSonrasi:"b2_tunel", olumSahnesi:"b2_olum_gece"
-  },
-  "b2_olum_gece": {
-    metin: ["Karanlık seni sarıyor. <span class='kirmizi'>Gece Yarısı seni yuttu.</span>"],
-    secenekler: [{ metin: "[ Tekrar Dene ]", sonraki: "b2_kacis_koridoru", etki: (o) => o.can=100 }]
-  },
-  "b2_fener_kac": {
-    metin: ["Fener figürü <span class='vurgu'>geri itiyor.</span> <span class='yesil'>Geçtiniz.</span>"],
-    secenekler: [{ metin: "Tünele devam", sonraki: "b2_tunel" }]
-  },
-  "b2_tunel": {
-    metin: [
-      "Orman. Soğuk hava. Baban diz çöküyor ama <span class='cesur'>serbest.</span>",
-      "\"Raven seni bulacak. Liderlerini tanıyor musun?\""
-    ],
-    secenekler: [
-      { metin: "\"Hayır. Kim bu Raven?\"", sonraki: "b2_raven_sirri" },
-      { metin: "\"Önce güvenli yer bulalım\"", sonraki: "b2_kamp" },
-    ]
-  },
-  "b2_raven_sirri": {
-    metin: [
-      "\"Raven... <span class='kirmizi'>bir zamanlar benim öğrencimdi.</span>\"",
-      "\"Ona her şeyi öğrettim. Formülü de.\""
-    ],
-    secenekler: [{ metin: "\"Durdurmamız lazım\"", sonraki: "b2_karar", etki: (o) => { o.kararlar.push("raven_ogrendi"); o.cesaret=Math.min(5,o.cesaret+1); } }]
-  },
-  "b2_kamp": {
-    metin: ["Ateş. Baban sana bakıyor. \"Sormak istediğin şeyler var.\""],
-    secenekler: [{ metin: "\"Raven kim?\"", sonraki: "b2_raven_sirri" }]
-  },
-  "b2_kac_kac": {
-    metin: ["\"Kaçsak... Raven formülü başkasından alır. Binlerce ölür. Ve geri getirilir. <span class='kirmizi'>Sonsuza savaşmak için.</span>\""],
-    secenekler: [{ metin: "\"Durduracağız.\"", sonraki: "b2_karar", etki: (o) => o.cesaret=Math.min(5,o.cesaret+1) }]
-  },
-  "b2_karar": {
-    metin: [
-      "Baban gülümsüyor — ilk kez. \"Aldric'in oğlusun gerçekten.\"",
-      "\"Raven'ın üssü kulenin altında. <span class='cesur'>Ama o artık insan değil.</span>\""
-    ],
-    secenekler: [{ metin: "[ 3. Bölüm Başlıyor ]", sonraki: "b3_giris" }]
-  },
+  // Maron diyalog sahnesi
+  "yasli_adam_tanisma":{metin:["Adam seni görünce elleri titriyor. <span class='cesur'>\"Aldric'in oğlu...\"</span>","<span class='vurgu'>Uzun süre konuşmamışa benziyor.</span> Ama gözlerinde anlatacakları var."],secenekler:[{metin:"Maron ile konuş (Diyalog)",sonraki:"__diyalog_maron__"},{metin:"\"Götür beni\" de, git",sonraki:"ust_kat",etki:o=>{o.kararlar.push("maron_ile_gitti");}}]},
 
-  // ══ 3. BÖLÜM ══
-  "b3_giris": {
-    metin: [
-      "<span class='vurgu'>— ÜÇÜNCÜ BÖLÜM: YÜZLEŞME —</span>",
-      "Gizli asansör. Aşağı. Geniş yuvarlak oda. Kristaller her yerde.",
-      "Ve ortada — <span class='kirmizi'>Raven.</span> Sırtı dönük."
-    ],
-    secenekler: [
-      { metin: "Sessizce yaklaş", sonraki: "b3_yaklasma" },
-      { metin: "\"Raven!\" diye bağır", sonraki: "b3_bagir" },
-    ]
-  },
-  "b3_yaklasma": {
-    metin: [
-      "\"Biliyordum geleceklerini.\" Yavaşça dönüyor.",
-      "Maske. Siyah. Ve altında gözler — <span class='kirmizi'>babanın gözlerine benziyor.</span>"
-    ],
-    secenekler: [
-      { metin: "\"Formülü asla alamazsın\"", sonraki: "b3_son_savas" },
-      { metin: "\"Neden bunu yapıyorsun?\"", sonraki: "b3_neden" },
-    ]
-  },
-  "b3_bagir": {
-    metin: ["\"Aldric'in oğlu. Cesaretli — ya da aptal.\" — \"Fark etmez. İkisi de aynı sona çıkar.\""],
-    secenekler: [
-      { metin: "Savaş!", sonraki: "b3_son_savas" },
-      { metin: "\"Neden?\"", sonraki: "b3_neden" },
-    ]
-  },
-  "b3_neden": {
-    metin: [
-      "\"Anneni hatırlıyor musun, Kael?\" Donuyorsun.",
-      "\"Ben gördüm. Aldric formülü onun için buldu. Ama <span class='kirmizi'>kullanmadı.</span>\"",
-      "\"<span class='cesur'>Ben kullanacağım. Bir daha kimse kaybetmeyecek.</span>\""
-    ],
-    secenekler: [
-      { metin: "\"Bu hatalı. Savaşacağım.\"", sonraki: "b3_son_savas", etki: (o) => o.kararlar.push("raven_anladi") },
-      { metin: "\"Belki haklısın...\"", sonraki: "b3_ihanet" },
-    ]
-  },
-  "b3_ihanet": {
-    metin: ["\"Gözlerinde inanç yok. Beni durdurmaya çalışıyorsun.\" — <span class='kirmizi'>\"Pişman olacaksın.\"</span>"],
-    secenekler: [{ metin: "Savaş — başka yol yok", sonraki: "b3_son_savas" }]
-  },
-  "b3_son_savas": {
-    tip:"savas", dusman:"birlik_lideri",
-    metin: [
-      "<span class='cesur'>Raven kristal zırhını çıkarıyor.</span>",
-      "\"Sen babanın gururusun. Ama bu seni kurtarmaz.\" <span class='kirmizi'>Son savaş.</span>"
-    ],
-    sahneSonrasi:"b3_zafer", olumSahnesi:"b3_olum"
-  },
-  "b3_olum": {
-    metin: ["Raven son darbeyi indiriyor. <span class='kirmizi'>Formül onun eline geçiyor.</span>"],
-    secenekler: [{ metin: "[ Tekrar Dene ]", sonraki: "b3_giris", etki: (o) => o.can=100 }]
-  },
-  "b3_zafer": {
-    metin: [
-      "<span class='yesil'>Raven yere düşüyor.</span> Maske çatlıyor. Altında genç, yorgun bir yüz.",
-      "\"Bırak beni... yok edeyim. Bu benim yapabileceğim son iyi şey.\""
-    ],
-    secenekler: [
-      { metin: "Raven'a güven", sonraki: "son_iyi" },
-      { metin: "Formülü kendin yok et", sonraki: "son_kendi" },
-    ]
-  },
-  "son_iyi": {
-    metin: [
-      "Raven kristallere uzanıyor. <span class='cesur'>Işık patlaması. Tüm kristaller kararıyor.</span>",
-      "Baban eski öğrencisinin yanına diz çöküyor.",
-      "Ve sen orada, her şeyin nasıl hem bittiğini hem başladığını hissediyorsun.",
-      "<span class='yesil'>✦ OYUN SONU — Barış ✦</span>"
-    ],
-    secenekler: [{ metin: "[ Baştan Oyna ]", sonraki: "baslangic", etki: resetOyuncu }]
-  },
-  "son_kendi": {
-    metin: [
-      "Kristallere yumruğunu vuruyorsun. <span class='kirmizi'>Acı.</span> Ama devam ediyorsun.",
-      "Baban koşuyor. \"Kael!\" Gözlerini açıyorsun. <span class='yesil'>\"Bitti.\"</span>",
-      "<span class='yesil'>✦ OYUN SONU — Fedakarlık ✦</span>"
-    ],
-    secenekler: [{ metin: "[ Baştan Oyna ]", sonraki: "baslangic", etki: resetOyuncu }]
-  },
+  "dusman_hakkinda":{metin:["\"Birliğin adamları. Ölümsüz ordu istiyorlar. <span class='kirmizi'>Gitmeliyiz.</span>\""],secenekler:[{metin:"\"Götür beni\"",sonraki:"ust_kat",etki:o=>{o.kararlar.push("birlik_ogrendi");bildirimGoster("⚠️ Birlik öğrenildi");}}]},
+  "baba_nerede_sor":{metin:["\"Yukarıda. Ama kule onu <span class='kirmizi'>değiştirdi.</span>\""],secenekler:[{metin:"Takip et",sonraki:"ust_kat"}]},
+  "yasli_adam_dur":{metin:["\"Ben Kael, Aldric'in oğluyum.\" Adam döndü. <span class='vurgu'>Hem korku hem umut.</span>"],secenekler:[{metin:"\"Babam nerede?\"",sonraki:"yasli_adam_tanisma"}]},
+  "yasli_adam_takip":{metin:["Adam gizli bir kapak açıyor."],secenekler:[{metin:"Kapaktan in",sonraki:"bodrum"},{metin:"Adama seslen",sonraki:"yasli_adam_dur"}]},
+  "ust_kat":{metin:["Üçüncü kat. <span class='vurgu'>Işık sızan kapı.</span>"],secenekler:[{metin:"Kapıyı aç",sonraki:"baba_ile_kavusma"}]},
+  "bodrum":{metin:["Kristaller içinde donmuş figür. Babanın yüzü. <span class='cesur'>Hayatta.</span>"],secenekler:[{metin:"Kristale dokun",sonraki:"kristal_dokunma"},{metin:"Etrafı incele",sonraki:"bodrum_incele"}]},
+  "kristal_dokunma":{metin:["<span class='vurgu'>Elektrik gibi his.</span> Gözleri açılıyor. <span class='cesur'>\"Kael. Beni buldun.\"</span>"],secenekler:[{metin:"[ 2. Bölüm ]",sonraki:"b2_baslangic"}]},
+  "bodrum_incele":{metin:["\"Adını söyle, zinciri kır.\""],secenekler:[{metin:"\"Aldric\" fısılda",sonraki:"kristal_dokunma"}]},
+  "baba_ile_kavusma":{metin:["<span class='cesur'>Baban.</span> Yatakta. Gözlerini açıyor. Yıllar. Şimdi burada."],secenekler:[{metin:"[ 2. Bölüm ]",sonraki:"b2_baslangic"}]},
+
+  // 2. BÖLÜM
+  "b2_baslangic":{metin:["<span class='vurgu'>— İKİNCİ BÖLÜM: KAÇIŞ —</span>","Baban: <span class='kirmizi'>\"Gitmeliyiz. Şimdi.\"</span> Uzaktan demir çizmeler."],secenekler:[{metin:"\"Formül nedir?\"",sonraki:"b2_formul_sor"},{metin:"Kaçış yolu bul",sonraki:"b2_kacis_ara",etki:o=>o.cesaret=Math.min(5,o.cesaret+1)}]},
+  "b2_formul_sor":{metin:["\"Formül ölüleri geri getirebiliyor. Ve artık <span class='kirmizi'>senin kanında.</span>\""],secenekler:[{metin:"\"Yani ben silahım.\"",sonraki:"b2_silah_sahne",etki:o=>o.kararlar.push("formul_ogrendi")}]},
+  "b2_silah_sahne":{metin:["<span class='cesur'>Kapı açılıyor.</span> İki Gölge Asker. <span class='kirmizi'>\"Kael teslim olacak.\"</span>"],secenekler:[{metin:"⚔️ Savaş!",sonraki:"b2_savas_1",etki:o=>o.kararlar.push("savasti")},{metin:"\"Tamam, gidiyorum\"",sonraki:"b2_teslim_ol"}]},
+  "b2_savas_1":{tip:"savas",dusman:"golge_asker",metin:["<span class='cesur'>Gölge Asker yaklaşıyor.</span>"],sahneSonrasi:"b2_savas_1_zafer",olumSahnesi:"b2_olum_asker"},
+  "b2_savas_1_zafer":{metin:["<span class='yesil'>İlk asker düşüyor.</span> İkincisi <span class='kirmizi'>takviye istiyor.</span>","Baban: \"Arka kapı. Hızlı.\""],secenekler:[{metin:"Arka kapıya koş",sonraki:"b2_kacis_koridoru"},{metin:"İkincisini de durdur",sonraki:"b2_savas_2"}]},
+  "b2_savas_2":{tip:"savas",dusman:"kule_bekcisi",metin:["İkinci asker — ağır, yavaş. <span class='cesur'>Ama bir darbesi yeter.</span>"],sahneSonrasi:"b2_kacis_koridoru",olumSahnesi:"b2_olum_asker"},
+  "b2_teslim_ol":{metin:["Baban <span class='kirmizi'>\"HAYIR!\"</span> diye bağırıyor. <span class='kirmizi'>Teslim olmamalıydın.</span>"],secenekler:[{metin:"[ Tekrar Dene ]",sonraki:"b2_baslangic",etki:o=>o.can=100}]},
+  "b2_olum_asker":{metin:["<span class='kirmizi'>Yere çöküyorsun.</span>"],secenekler:[{metin:"[ Tekrar Dene ]",sonraki:"b2_silah_sahne",etki:o=>o.can=100}]},
+  "b2_kacis_ara":{metin:["Duvarda <span class='vurgu'>gizli geçit.</span>"],secenekler:[{metin:"Geçitten geç",sonraki:"b2_gizli_gecit",etki:o=>o.kararlar.push("gecit_buldu")},{metin:"Kapıdan çık (riskli)",sonraki:"b2_silah_sahne"}]},
+  "b2_gizli_gecit":{metin:["Tünel sizi altkatına çıkarıyor. <span class='yesil'>Geçtiniz.</span>"],secenekler:[{metin:"Koş",sonraki:"b2_tunel"}]},
+  "b2_kacis_koridoru":{metin:["Köşede <span class='kirmizi'>Gece Yarısı</span> — kulenin ruhu."],secenekler:[{metin:"Savaş!",sonraki:"b2_savas_gece",etki:o=>o.kararlar.push("gece_ile_savasti")},{metin:"Fenerle geç",sonraki:"b2_fener_kac",kosul:o=>o.envanter.includes("Fener")}]},
+  "b2_savas_gece":{tip:"savas",dusman:"gece_yarasi",metin:["<span class='cesur'>Gece Yarısı</span> — Savunma onun zayıflığı."],sahneSonrasi:"b2_tunel",olumSahnesi:"b2_olum_gece"},
+  "b2_olum_gece":{metin:["<span class='kirmizi'>Gece Yarısı seni yuttu.</span>"],secenekler:[{metin:"[ Tekrar Dene ]",sonraki:"b2_kacis_koridoru",etki:o=>o.can=100}]},
+  "b2_fener_kac":{metin:["Fener figürü geri itiyor. <span class='yesil'>Geçtiniz.</span>"],secenekler:[{metin:"Tünele",sonraki:"b2_tunel"}]},
+  "b2_tunel":{metin:["Orman. Soğuk hava. Baban yorgun ama <span class='cesur'>serbest.</span>","\"Raven seni bulacak.\""],secenekler:[{metin:"\"Kim bu Raven?\"",sonraki:"b2_raven_sirri"},{metin:"Önce güvenli yer",sonraki:"b2_kamp"}]},
+  "b2_raven_sirri":{metin:["\"Raven... <span class='kirmizi'>benim öğrencimdi.</span>\" Eller titriyor."],secenekler:[{metin:"\"Durdurmamız lazım\"",sonraki:"b2_karar",etki:o=>{o.kararlar.push("raven_ogrendi");o.cesaret=Math.min(5,o.cesaret+1);}}]},
+  "b2_kamp":{metin:["Ateş. \"Sormak istediğin şeyler var.\""],secenekler:[{metin:"\"Raven kim?\"",sonraki:"b2_raven_sirri"}]},
+  "b2_karar":{metin:["Baban gülümsüyor — ilk kez. \"Aldric'in oğlusun.\"","\"Raven'ın üssü kulenin altında. <span class='cesur'>Ama o artık insan değil.</span>\""],secenekler:[{metin:"[ 3. Bölüm ]",sonraki:"b3_giris"}]},
+
+  // 3. BÖLÜM
+  "b3_giris":{metin:["<span class='vurgu'>— ÜÇÜNCÜ BÖLÜM: YÜZLEŞME —</span>","Gizli asansör. Yuvarlak oda. Kristaller. Ve ortada — <span class='kirmizi'>Raven.</span>"],secenekler:[{metin:"Sessizce yaklaş",sonraki:"b3_yaklasma"},{metin:"\"Raven!\" bağır",sonraki:"b3_bagir"}]},
+  "b3_yaklasma":{metin:["\"Biliyordum.\" Maske altında gözler — <span class='kirmizi'>babanın gözlerine benziyor.</span>"],secenekler:[{metin:"\"Formülü alamazsın\"",sonraki:"b3_son_savas"},{metin:"\"Neden bunu yapıyorsun?\"",sonraki:"b3_neden"},{metin:"Raven ile konuş (Diyalog)",sonraki:"__diyalog_raven__"}]},
+  "b3_bagir":{metin:["\"Cesaretli — ya da aptal. Fark etmez.\""],secenekler:[{metin:"Savaş!",sonraki:"b3_son_savas"},{metin:"\"Neden?\"",sonraki:"b3_neden"}]},
+  "b3_neden":{metin:["\"Anneni hatırlıyor musun?\" Donuyorsun.","\"<span class='cesur'>Ben kullanacağım formülü. Bir daha kimse kaybetmeyecek.</span>\""],secenekler:[{metin:"\"Bu hatalı.\"",sonraki:"b3_son_savas",etki:o=>o.kararlar.push("raven_anladi")},{metin:"Diyalog kur",sonraki:"__diyalog_raven__"}]},
+  "b3_ihanet":{metin:["\"Gözlerinde inanç yok.\" — <span class='kirmizi'>\"Pişman olacaksın.\"</span>"],secenekler:[{metin:"Savaş",sonraki:"b3_son_savas"}]},
+  "b3_son_savas":{tip:"savas",dusman:"birlik_lideri",metin:["<span class='cesur'>Raven kristal zırhını çıkarıyor.</span> <span class='kirmizi'>Son savaş.</span>"],sahneSonrasi:"b3_zafer",olumSahnesi:"b3_olum"},
+  "b3_olum":{metin:["<span class='kirmizi'>Formül Raven'ın eline geçiyor.</span>"],secenekler:[{metin:"[ Tekrar Dene ]",sonraki:"b3_giris",etki:o=>o.can=100}]},
+  "b3_zafer":{metin:["<span class='yesil'>Raven yere düşüyor.</span> Maske çatlıyor. Genç, yorgun bir yüz.","\"Bırak beni yok edeyim. Son iyi şeyim bu.\""],secenekler:[{metin:"Raven'a güven",sonraki:"son_iyi"},{metin:"Kendin yok et",sonraki:"son_kendi"},{metin:"Bir dakika — konuşalım",sonraki:"b4_giris",kosul:o=>o.kararlar.includes("raven_anlasma")}]},
+  "son_iyi":{metin:["<span class='cesur'>Işık patlaması. Kristaller kararıyor.</span> Formül yok oldu.","Baban eski öğrencisinin yanına diz çöküyor.","<span class='yesil'>✦ OYUN SONU — Barış ✦</span>"],secenekler:[{metin:"[ Baştan Oyna ]",sonraki:"baslangic",etki:o=>{o.kararlar.push("baris_sonu");skorKaydet();resetOyuncu(o);}}]},
+  "son_kendi":{metin:["Kristallere yumruğunu vuruyorsun. <span class='kirmizi'>Acı.</span> Ama devam.","Baban: <span class='yesil'>\"Bitti.\"</span>","<span class='yesil'>✦ OYUN SONU — Fedakarlık ✦</span>"],secenekler:[{metin:"[ Baştan Oyna ]",sonraki:"baslangic",etki:o=>{o.kararlar.push("fedakar_sonu");skorKaydet();resetOyuncu(o);}}]},
+
+  // 4. BÖLÜM — GİZLİ SON
+  "b4_giris":{metin:["<span class='vurgu'>— DÖRDÜNCÜ BÖLÜM: GERÇEK SON —</span>","Raven'a yardım ettiriyor elini uzatıyorsun. Baban şaşkınlıkla bakıyor.","\"Ne planın var?\" diye soruyorsun. Raven'ın gözleri ilk kez umut taşıyor."],secenekler:[{metin:"\"Bize anlat\"",sonraki:"b4_raven_anlasma"}]},
+  "b4_raven_anlasma":{metin:["\"Formülü yok etmek için... üç kişi gerekiyor. Vereni, taşıyanı ve... vazgeçeni.\"","Baban'a bakıyor. <span class='cesur'>\"Aldric. Sen verdin. Kael taşıdı. Ben vazgeçeceğim.\"</span>","\"Ama bu seni...\" diyorsun. Raven başını sallıyor. \"Biliyorum.\""],secenekler:[{metin:"\"Hazırız.\"",sonraki:"b4_ritual"},{metin:"\"Başka yol yok mu?\"",sonraki:"b4_ritual"}]},
+  "b4_ritual":{metin:["Üçünüz kristal odanın ortasına duruyor. Baban elini Raven'ın omzuna koyuyor.","Işık. Önce sarı. Sonra <span class='vurgu'>beyaz.</span> Sonra...","<span class='cesur'>Sessizlik.</span>"],secenekler:[{metin:"[ Son sahne ]",sonraki:"b4_son"}]},
+  "b4_son":{metin:["Gözlerini açıyorsun. Orman. Sabah ışığı.","Baban yanında. Raven... yok. Ama elinde küçük bir kristal parçası var.","<span class='vurgu'>İçinde bir ışık titriyor.</span>","<span class='yesil'>✦ GERÇEK SON — Üç kişilik fedakarlık ✦</span>"],secenekler:[{metin:"[ Baştan Oyna ]",sonraki:"baslangic",etki:o=>{o.kararlar.push("gercek_son");o.puan+=500;skorKaydet();bildirimGoster("🔮 Gerçek Son! +500 puan");resetOyuncu(o);}}]},
 };
 
-// ── RESET ────────────────────────────────────────────────────
-function resetOyuncu(o) {
-  o.can=100; o.maxCan=100; o.cesaret=3; o.buyuGucu=0;
+// ════════════════════════════════════════════════
+//  RESET
+// ════════════════════════════════════════════════
+function resetOyuncu(o){
+  o.can=o.maxCan; o.cesaret=3; o.buyuGucu=0;
   o.envanter=["Fener","Hançer"]; o.kararlar=[]; o.puan=0;
-  o.saldiriGucu=18; o.savunma=5;
   kesfedilenler.clear();
+  muzikCal("normal");
 }
 
-// ── ANA SAHNE YÜKLEYİCİ ──────────────────────────────────────
-let typewriterDevam = true; // Typewriter sırasında bekleyelim mi
+// ════════════════════════════════════════════════
+//  EKRAN YÖNETİMİ
+// ════════════════════════════════════════════════
+function ekranGec(id){
+  document.querySelectorAll(".ekran").forEach(e=>e.classList.remove("aktif"));
+  document.getElementById(id).classList.add("aktif");
+}
 
-function sahneYukle(sahneAdi) {
-  const sahne = sahneler[sahneAdi];
-  if (!sahne) { console.error("Sahne yok:", sahneAdi); return; }
+function yeniOyunBaslat(){ ekranGec("ekran-karakter"); }
 
-  const metinKutusu = document.getElementById("metin-kutusu");
-  const secDiv = document.getElementById("secenekler");
-  metinKutusu.innerHTML = "";
-  secDiv.innerHTML = "";
+function karakterOlustur(){
+  const isim=document.getElementById("isim-input").value.trim()||"Kael";
+  const sinif=siniflar[seciliSinif];
+  oyuncu.isim=isim; oyuncu.sinif=seciliSinif; oyuncu.sinifIcon=sinif.icon;
+  oyuncu.maxCan=100+sinif.canBonus; oyuncu.can=oyuncu.maxCan;
+  oyuncu.saldiriGucu=18+sinif.saldiriBonus;
+  oyuncu.savunma=5+sinif.savunmaBonus;
+  oyuncu.buyuEsigi=sinif.buyuEsigi; oyuncu.maxBuyuGucu=sinif.buyuEsigi;
+  oyuncu.buyuHasarCarpani=sinif.buyuHasarCarpani;
+  oyuncu.ciftHamleOlasiligi=sinif.ciftHamleOlasiligi;
+  oyuncu.buyuGucu=0; oyuncu.kararlar=[]; oyuncu.envanter=["Fener","Hançer"]; oyuncu.puan=0;
+  kesfedilenler.clear();
+  document.getElementById("sinif-rozet").textContent=sinif.icon+" "+sinif.isim;
+  ekranGec("ekran-oyun");
+  sahneYukle("baslangic");
+  bildirimGoster(`${sinif.icon} ${isim} — ${sinif.isim} olarak başlandı!`,3000);
+  sesCal("zafer");
+}
 
-  // Harita güncelle
+function anaMenuye(){
+  skorKaydet();
+  ekranGec("ekran-basit");
+  const kayit=kayitYukle();
+  if(kayit){
+    document.getElementById("devam-btn").style.display="block";
+    document.getElementById("kayit-bilgi").textContent="Son kayıt: "+kayit.zaman;
+  }
+  document.getElementById("en-yuksek-skor").textContent=enYuksekSkor;
+}
+
+function basarimEkraniAc(){
+  ekranGec("ekran-basarim");
+  const grid=document.getElementById("basarim-grid"); grid.innerHTML="";
+  basarimlar.forEach(b=>{
+    const kazanildi=kazanilanBasarimlar.has(b.id);
+    const div=document.createElement("div");
+    div.className="basarim-item"+(kazanildi?" kazanildi":"");
+    div.innerHTML=`<span class="b-icon">${b.icon}</span><div class="b-bilgi"><div class="b-ad">${b.ad}</div><div class="b-tanim">${b.tanim}</div></div>`;
+    grid.appendChild(div);
+  });
+  document.getElementById("en-yuksek-skor").textContent=enYuksekSkor;
+  const kayit=kayitYukle();
+  if(kayit&&kayit.oyuncu) document.getElementById("son-oyun-skor").textContent="Son oyun: "+kayit.oyuncu.puan+" puan";
+}
+
+// ════════════════════════════════════════════════
+//  ANA SAHNE YÜKLEYİCİ
+// ════════════════════════════════════════════════
+function sahneYukle(sahneAdi){
+  // Özel diyalog sahneleri
+  if(sahneAdi==="__diyalog_maron__"){ diyalogBaslat("maron_diyalog"); return; }
+  if(sahneAdi==="__diyalog_raven__"){ diyalogBaslat("raven_diyalog"); return; }
+
+  const sahne=sahneler[sahneAdi];
+  if(!sahne){console.error("Sahne yok:",sahneAdi);return;}
+  oyuncu.aktifSahne=sahneAdi;
+
+  const metinKutusu=document.getElementById("metin-kutusu");
+  const secDiv=document.getElementById("secenekler");
+  metinKutusu.innerHTML=""; secDiv.innerHTML="";
+  document.getElementById("diyalog-kutu").style.display="none";
+
   haritaGuncelle(sahneAdi);
+  const g=sahneGorselleri[sahneAdi]||{emoji:"🏰",lokasyon:"Kule",atmosfer:""};
+  const sEl=document.getElementById("sahne-gorseli");
+  sEl.className=g.atmosfer||"";
+  document.getElementById("sahne-ascii").textContent=g.emoji;
+  document.getElementById("sahne-lokasyon").textContent=g.lokasyon;
+  gorevGuncelle(); durumGuncelle();
+  basarimKontrol();
 
-  // Sahne görseli güncelle
-  const gorsel = sahneGorselleri[sahneAdi] || { emoji:"🏰", lokasyon:"Kule", atmosfer:"" };
-  const sahneEl = document.getElementById("sahne-gorseli");
-  sahneEl.className = gorsel.atmosfer || "";
-  document.getElementById("sahne-ascii").textContent = gorsel.emoji;
-  document.getElementById("sahne-lokasyon").textContent = gorsel.lokasyon;
+  // Müzik tipi
+  if(g.atmosfer==="atmosfer-savas") muzikCal("savas");
+  else if(g.atmosfer==="atmosfer-umut") muzikCal("zafer");
 
-  // NPC göster / gizle
-  npcGoster(gorsel.npc || null);
-
-  // Görevleri güncelle
-  gorevGuncelle();
-  durumGuncelle();
-
-  // SAVAŞ SAHNESİ mi?
-  if (sahne.tip === "savas") {
-    sahne.metin.forEach((p, i) => {
-      const el = document.createElement("p");
-      el.innerHTML = p;
-      el.style.opacity = "0";
-      el.style.animation = `goster 0.5s ${i*0.2}s ease forwards`;
+  if(sahne.tip==="savas"){
+    sahne.metin.forEach((p,i)=>{
+      const el=document.createElement("p"); el.innerHTML=p;
+      el.style.opacity="0"; el.style.animation=`goster 0.5s ${i*0.2}s ease forwards`;
       metinKutusu.appendChild(el);
     });
     savaSBaslat(sahne);
-    const sahneSonrasi = sahne.sahneSonrasi;
-    const olumSahnesi = sahne.olumSahnesi;
-
+    const ss=sahne.sahneSonrasi, os=sahne.olumSahnesi;
     [
-      { id:"saldir",   metin:"⚔️  Saldır — Direkt hasar ver",          sinif:"saldir"   },
-      { id:"savun",    metin:"🛡️  Savun — Hasarı azalt, karşılık ver",  sinif:"savun"    },
-      { id:"strateji", metin:"🎯  Strateji — Zayıflığı bul ve vur",     sinif:"strateji" },
-      { id:"buyu",     metin:"✨  Büyü Patlaması — 5 güç gerekli",      sinif:"buyu"     },
-    ].forEach((h, i) => {
-      const btn = document.createElement("button");
-      btn.className = "secenek-btn " + h.sinif;
-      btn.innerHTML = `<span class="ok">›</span>${h.metin}`;
-      btn.style.animationDelay = (sahne.metin.length * 0.2 + i * 0.12 + 0.3) + "s";
-      if (h.id === "buyu") {
-        btn.title = "5 büyü gücü birik lazım";
-      }
-      btn.addEventListener("click", () => {
-        // Büyü için güç kontrolü
-        if (h.id === "buyu" && oyuncu.buyuGucu < oyuncu.maxBuyuGucu) {
-          bildirimGoster(`✦ ${oyuncu.buyuGucu}/${oyuncu.maxBuyuGucu} — Yeterli büyü gücü yok!`, 2000);
-          return;
-        }
-        if (!aktifSavas) return;
-        secDiv.querySelectorAll("button").forEach(b => b.disabled = true);
-        savasHamle(h.id, sahneSonrasi, olumSahnesi, secDiv);
+      {id:"saldir",metin:"⚔️  Saldır — Direkt hasar ver",sinif:"saldir"},
+      {id:"savun", metin:"🛡️  Savun — Hasarı azalt, karşılık ver",sinif:"savun"},
+      {id:"strateji",metin:"🎯  Strateji — Zayıflığı bul ve vur",sinif:"strateji"},
+      {id:"buyu",  metin:`✨  Büyü Patlaması — ${oyuncu.buyuEsigi} güç gerekli`,sinif:"buyu"},
+    ].forEach((h,i)=>{
+      const btn=document.createElement("button");
+      btn.className="secenek-btn "+h.sinif;
+      btn.innerHTML=`<span class="ok">›</span>${h.metin}`;
+      btn.style.animationDelay=(sahne.metin.length*0.2+i*0.12+0.3)+"s";
+      btn.addEventListener("click",()=>{
+        if(h.id==="buyu"&&oyuncu.buyuGucu<oyuncu.buyuEsigi){bildirimGoster(`✦ ${oyuncu.buyuGucu}/${oyuncu.buyuEsigi} — Yeterli güç yok!`,2000);return;}
+        if(!aktifSavas)return;
+        secDiv.querySelectorAll("button").forEach(b=>b.disabled=true);
+        savasHamle(h.id,ss,os,secDiv);
+        sesCal("tikla");
       });
       secDiv.appendChild(btn);
     });
     return;
   }
 
-  // NORMAL SAHNE — typewriter ile metin yaz
-  typewriterDevam = false;
-  paragraflaraYaz(sahne.metin, metinKutusu, 22, () => {
-    typewriterDevam = true;
-    // Seçenekler typewriter bittikten sonra çıksın
-    sahne.secenekler.forEach((s, i) => {
-      if (s.kosul && !s.kosul(oyuncu)) return;
-      const btn = document.createElement("button");
-      btn.className = "secenek-btn";
-      btn.innerHTML = `<span class="ok">›</span>${s.metin}`;
-      btn.style.animationDelay = (i * 0.12) + "s";
-      btn.style.opacity = "0";
-      btn.style.animation = `goster 0.4s ${i*0.12}s ease forwards`;
-      btn.addEventListener("click", () => {
-        if (s.etki) s.etki(oyuncu);
+  paragraflaraYaz(sahne.metin,metinKutusu,20,()=>{
+    sahne.secenekler.forEach((s,i)=>{
+      if(s.kosul&&!s.kosul(oyuncu))return;
+      const btn=document.createElement("button");
+      btn.className="secenek-btn";
+      btn.innerHTML=`<span class="ok">›</span>${s.metin}`;
+      btn.style.animationDelay=(i*0.12)+"s";
+      btn.style.opacity="0"; btn.style.animation=`goster 0.4s ${i*0.1}s ease forwards`;
+      btn.addEventListener("click",()=>{
+        sesCal("tikla");
+        if(s.etki)s.etki(oyuncu);
         sahneGecis(s.sonraki);
       });
       secDiv.appendChild(btn);
     });
-    // Son görev kontrolü
-    if (sahneAdi === "son_iyi" || sahneAdi === "son_kendi") {
+    if(sahneAdi==="son_iyi"||sahneAdi==="son_kendi"||sahneAdi==="b4_son"){
       oyuncu.kararlar.push("oyun_bitti");
-      gorevGuncelle();
-      bildirimGoster(`🏆 Oyun tamamlandı! Toplam puan: ${oyuncu.puan}`, 4000);
+      gorevGuncelle(); basarimKontrol(); skorKaydet();
+      sesCal("zafer");
     }
   });
 }
 
-// ── SAHNE GEÇİŞİ ────────────────────────────────────────────
-function sahneGecis(sahneAdi) {
-  const perde = document.getElementById("gecis-perdesi");
-  perde.style.opacity = "1"; perde.style.pointerEvents = "all";
-  setTimeout(() => {
+function sahneGecis(sahneAdi){
+  const perde=document.getElementById("gecis-perdesi");
+  perde.style.opacity="1"; perde.style.pointerEvents="all";
+  sesCal("gecis");
+  setTimeout(()=>{
     sahneYukle(sahneAdi);
-    perde.style.opacity = "0"; perde.style.pointerEvents = "none";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, 500);
+    perde.style.opacity="0"; perde.style.pointerEvents="none";
+    window.scrollTo({top:0,behavior:"smooth"});
+  },500);
 }
 
-// ── BAŞLAT ───────────────────────────────────────────────────
-sahneYukle("baslangic");
+// ════════════════════════════════════════════════
+//  BAŞLAT
+// ════════════════════════════════════════════════
+(function init(){
+  const kayit=kayitYukle();
+  if(kayit){ document.getElementById("devam-btn").style.display="block"; document.getElementById("kayit-bilgi").textContent="Son kayıt: "+(kayit.zaman||"?"); }
+  document.getElementById("en-yuksek-skor").textContent=enYuksekSkor;
+})();
 </script>
 </body>
 </html>
